@@ -1,0 +1,49 @@
+{
+  "name": "cls-rtracer",
+  "version": "1.0.0",
+  "description": "Express and Koa middlewares for CLS-based request id generation, batteries included",
+  "author": "Andrey Pechkurov",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/puzpuzpuz/cls-rtracer/issues"
+  },
+  "homepage": "https://github.com/puzpuzpuz/cls-rtracer",
+  "main": "index.js",
+  "engines": {
+    "node": ">=8.0.0 - <10.0.0 || >=10.4.0"
+  },
+  "files": [
+    "index.js"
+  ],
+  "scripts": {
+    "test-ci": "npm run lint && npm run test",
+    "cover": "jest --coverage --coverageReporters=text-lcov | coveralls",
+    "test": "jest",
+    "lint": "standard"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:puzpuzpuz/cls-rtracer.git"
+  },
+  "keywords": [
+    "express",
+    "koa",
+    "cls",
+    "request",
+    "request id",
+    "logging"
+  ],
+  "dependencies": {
+    "cls-hooked": "^4.2.2",
+    "uuid": "^3.3.2"
+  },
+  "devDependencies": {
+    "coveralls": "^3.0.2",
+    "express": "^4.16.4",
+    "jest": "^23.6.0",
+    "koa": "^2.6.2",
+    "standard": "^12.0.1",
+    "supertest": "^3.3.0",
+    "winston": "^3.1.0"
+  }
+}
