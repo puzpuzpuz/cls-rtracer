@@ -160,15 +160,16 @@ describe('cls-rtracer for Express', () => {
       }, 0)
     })
 
+    const server = request(app)
     return Promise.all([
-      request(app).get('/test')
+      server.get('/test')
         .query({ reqName: 'id1' })
         .then(res => {
           expect(res.statusCode).toBe(200)
           expect(res.body.id.length).toBeGreaterThan(0)
           return res.body.id
         }),
-      request(app).get('/test')
+      server.get('/test')
         .query({ reqName: 'id2' })
         .then(res => {
           expect(res.statusCode).toBe(200)
@@ -196,15 +197,16 @@ describe('cls-rtracer for Express', () => {
         })
     })
 
+    const server = request(app)
     return Promise.all([
-      request(app).get('/test')
+      server.get('/test')
         .query({ reqName: 'id1' })
         .then(res => {
           expect(res.statusCode).toBe(200)
           expect(res.body.id.length).toBeGreaterThan(0)
           return res.body.id
         }),
-      request(app).get('/test')
+      server.get('/test')
         .query({ reqName: 'id2' })
         .then(res => {
           expect(res.statusCode).toBe(200)
@@ -230,15 +232,16 @@ describe('cls-rtracer for Express', () => {
       res.json({ id })
     })
 
+    const server = request(app)
     return Promise.all([
-      request(app).get('/test')
+      server.get('/test')
         .query({ reqName: 'id1' })
         .then(res => {
           expect(res.statusCode).toBe(200)
           expect(res.body.id.length).toBeGreaterThan(0)
           return res.body.id
         }),
-      request(app).get('/test')
+      server.get('/test')
         .query({ reqName: 'id2' })
         .then(res => {
           expect(res.statusCode).toBe(200)
