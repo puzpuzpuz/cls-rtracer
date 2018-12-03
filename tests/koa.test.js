@@ -1,10 +1,15 @@
-/* global describe, test, expect */
+/* global describe, test, expect, afterEach */
 'use strict'
 
 const Koa = require('koa')
 const request = require('supertest')
 
 const rTracer = require('../index')
+
+let server
+afterEach(() => {
+  if (server) server.close()
+})
 
 describe('cls-rtracer for Koa', () => {
   test('does not return id outside of request', () => {
@@ -23,7 +28,8 @@ describe('cls-rtracer for Koa', () => {
       ctx.body = { id }
     })
 
-    return request(app.listen()).get('/')
+    server = app.listen()
+    return request(server).get('/')
       .then(res => {
         expect(res.statusCode).toBe(200)
         expect(res.body.id).toEqual(id)
@@ -41,7 +47,8 @@ describe('cls-rtracer for Koa', () => {
       ctx.body = { id }
     })
 
-    return request(app.listen()).get('/')
+    server = app.listen()
+    return request(server).get('/')
       .set('X-Request-Id', idInHead)
       .then(res => {
         expect(res.statusCode).toBe(200)
@@ -60,7 +67,8 @@ describe('cls-rtracer for Koa', () => {
       ctx.body = { id }
     })
 
-    return request(app.listen()).get('/')
+    server = app.listen()
+    return request(server).get('/')
       .set('X-Request-Id', idInHead)
       .then(res => {
         expect(res.statusCode).toBe(200)
@@ -82,7 +90,8 @@ describe('cls-rtracer for Koa', () => {
       ctx.body = { id }
     })
 
-    return request(app.listen()).get('/')
+    server = app.listen()
+    return request(server).get('/')
       .set('x-another-req-id', idInHead)
       .then(res => {
         expect(res.statusCode).toBe(200)
@@ -99,7 +108,8 @@ describe('cls-rtracer for Koa', () => {
       ctx.body = { id }
     })
 
-    return request(app.listen()).get('/')
+    server = app.listen()
+    return request(server).get('/')
       .set('X-Request-Id', '')
       .then(res => {
         expect(res.statusCode).toBe(200)
@@ -118,7 +128,8 @@ describe('cls-rtracer for Koa', () => {
       ctx.body = { id }
     })
 
-    return request(app.listen()).get('/')
+    server = app.listen()
+    return request(server).get('/')
       .set('X-Request-Id', idInHead)
       .then(res => {
         expect(res.statusCode).toBe(200)
@@ -141,7 +152,8 @@ describe('cls-rtracer for Koa', () => {
         })
     })
 
-    return request(app.listen()).get('/')
+    server = app.listen()
+    return request(server).get('/')
       .then(res => {
         expect(res.statusCode).toBe(200)
         expect(res.body.id).toEqual(id)
@@ -162,15 +174,16 @@ describe('cls-rtracer for Koa', () => {
         })
     })
 
+    server = app.listen()
     return Promise.all([
-      request(app.listen()).get('/')
+      request(server).get('/')
         .query({ reqName: 'id1' })
         .then(res => {
           expect(res.statusCode).toBe(200)
           expect(res.body.id.length).toBeGreaterThan(0)
           return res.body.id
         }),
-      request(app.listen()).get('/')
+      request(server).get('/')
         .query({ reqName: 'id2' })
         .then(res => {
           expect(res.statusCode).toBe(200)
@@ -196,15 +209,16 @@ describe('cls-rtracer for Koa', () => {
       ctx.body = { id }
     })
 
+    server = app.listen()
     return Promise.all([
-      request(app.listen()).get('/')
+      request(server).get('/')
         .query({ reqName: 'id1' })
         .then(res => {
           expect(res.statusCode).toBe(200)
           expect(res.body.id.length).toBeGreaterThan(0)
           return res.body.id
         }),
-      request(app.listen()).get('/')
+      request(server).get('/')
         .query({ reqName: 'id2' })
         .then(res => {
           expect(res.statusCode).toBe(200)
