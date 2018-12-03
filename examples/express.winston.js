@@ -40,7 +40,7 @@ async function fakeDbAccess () {
   return new Promise((resolve) => {
     setTimeout(() => {
       logger.info('Logs from fakeDbAccess')
-      resolve({ message: 'Hello from express-rtracer example' })
+      resolve({ message: 'Hello from cls-rtracer Express example' })
     }, 0)
   })
 }

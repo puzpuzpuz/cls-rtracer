@@ -30,7 +30,7 @@ const app = new Koa()
 
 app.use(rTracer.koaMiddleware())
 
-app.use(async ctx => {
+app.use(async (ctx) => {
   logger.info('Starting request handling')
   const result = await fakeDbAccess()
   ctx.body = result
@@ -40,7 +40,7 @@ async function fakeDbAccess () {
   return new Promise((resolve) => {
     setTimeout(() => {
       logger.info('Logs from fakeDbAccess')
-      resolve({ message: 'Hello from express-rtracer example' })
+      resolve({ message: 'Hello from cls-rtracer Koa example' })
     }, 0)
   })
 }

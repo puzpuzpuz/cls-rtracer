@@ -11,12 +11,12 @@ const ns = cls.createNamespace(nsid)
  * Generates a request tracer middleware for Express.
  * @param {Object} options possible options
  * @param {boolean} options.useHeader respect request header flag
- *                                    (default: `true`)
+ *                                    (default: `false`)
  * @param {string} options.headerName request header name, used if `useHeader` is set to `true`
  *                                    (default: `X-Request-Id`)
  */
-const exressMiddleware = ({
-  useHeader = true,
+const expressMiddleware = ({
+  useHeader = false,
   headerName = 'X-Request-Id'
 } = {}) => {
   return (req, res, next) => {
@@ -40,12 +40,12 @@ const exressMiddleware = ({
  * Generates a request tracer middleware for Koa.
  * @param {Object} options possible options
  * @param {boolean} options.useHeader respect request header flag
- *                                    (default: `true`)
+ *                                    (default: `false`)
  * @param {string} options.headerName request header name, used if `useHeader` is set to `true`
  *                                    (default: `X-Request-Id`)
  */
 const koaMiddleware = ({
-  useHeader = true,
+  useHeader = false,
   headerName = 'X-Request-Id'
 } = {}) => {
   return (ctx, next) => {
@@ -74,7 +74,7 @@ const id = () => {
 }
 
 module.exports = {
-  exressMiddleware,
+  expressMiddleware,
   koaMiddleware,
   id
 }

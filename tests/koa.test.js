@@ -6,7 +6,7 @@ const request = require('supertest')
 
 const rTracer = require('../index')
 
-describe('koa-rtracer', () => {
+describe('cls-rtracer for Koa', () => {
   test('does not return id outside of request', () => {
     const id = rTracer.id()
     expect(id).toBeUndefined()
@@ -18,30 +18,49 @@ describe('koa-rtracer', () => {
 
     let id
 
-    app.get('/test', (req, res) => {
+    app.use((ctx) => {
       id = rTracer.id()
-      res.json({ id })
+      ctx.body = { id }
     })
 
-    return request(app).get('/test')
+    return request(app.listen()).get('/')
       .then(res => {
         expect(res.statusCode).toBe(200)
         expect(res.body.id).toEqual(id)
       })
   })
 
-  test('uses header by default', () => {
-    const app = Koa()
+  test('ignores header by default', () => {
+    const app = new Koa()
     app.use(rTracer.koaMiddleware())
 
     const idInHead = 'id-from-header'
 
-    app.get('/test', (req, res) => {
+    app.use((ctx) => {
       const id = rTracer.id()
-      res.json({ id })
+      ctx.body = { id }
     })
 
-    return request(app).get('/test')
+    return request(app.listen()).get('/')
+      .set('X-Request-Id', idInHead)
+      .then(res => {
+        expect(res.statusCode).toBe(200)
+        expect(res.body.id).not.toEqual(idInHead)
+      })
+  })
+
+  test('uses default header in case of override', () => {
+    const app = new Koa()
+    app.use(rTracer.koaMiddleware({ useHeader: true }))
+
+    const idInHead = 'id-from-header'
+
+    app.use((ctx) => {
+      const id = rTracer.id()
+      ctx.body = { id }
+    })
+
+    return request(app.listen()).get('/')
       .set('X-Request-Id', idInHead)
       .then(res => {
         expect(res.statusCode).toBe(200)
@@ -50,17 +69,20 @@ describe('koa-rtracer', () => {
   })
 
   test('uses different header in case of override', () => {
-    const app = Koa()
-    app.use(rTracer.koaMiddleware({ headerName: 'x-another-req-id' }))
+    const app = new Koa()
+    app.use(rTracer.koaMiddleware({
+      useHeader: true,
+      headerName: 'x-another-req-id'
+    }))
 
     const idInHead = 'id-from-header'
 
-    app.get('/test', (req, res) => {
+    app.use((ctx) => {
       const id = rTracer.id()
-      res.json({ id })
+      ctx.body = { id }
     })
 
-    return request(app).get('/test')
+    return request(app.listen()).get('/')
       .set('x-another-req-id', idInHead)
       .then(res => {
         expect(res.statusCode).toBe(200)
@@ -69,15 +91,15 @@ describe('koa-rtracer', () => {
   })
 
   test('ignores header if empty', () => {
-    const app = Koa()
-    app.use(rTracer.koaMiddleware())
+    const app = new Koa()
+    app.use(rTracer.koaMiddleware({ useHeader: true }))
 
-    app.get('/test', (req, res) => {
+    app.use((ctx) => {
       const id = rTracer.id()
-      res.json({ id })
+      ctx.body = { id }
     })
 
-    return request(app).get('/test')
+    return request(app.listen()).get('/')
       .set('X-Request-Id', '')
       .then(res => {
         expect(res.statusCode).toBe(200)
@@ -86,17 +108,17 @@ describe('koa-rtracer', () => {
   })
 
   test('ignores header if disabled', () => {
-    const app = Koa()
+    const app = new Koa()
     app.use(rTracer.koaMiddleware({ useHeader: false }))
 
     const idInHead = 'id-from-header'
 
-    app.get('/test', (req, res) => {
+    app.use((ctx) => {
       const id = rTracer.id()
-      res.json({ id })
+      ctx.body = { id }
     })
 
-    return request(app).get('/test')
+    return request(app.listen()).get('/')
       .set('X-Request-Id', idInHead)
       .then(res => {
         expect(res.statusCode).toBe(200)
@@ -105,85 +127,50 @@ describe('koa-rtracer', () => {
       })
   })
 
-  test('generates id for request with callback', () => {
-    const app = Koa()
+  test('generates id for request with promise', () => {
+    const app = new Koa()
     app.use(rTracer.koaMiddleware())
 
     let id
 
-    app.get('/test', (req, res) => {
-      setTimeout(() => {
-        id = rTracer.id()
-        res.json({ id })
-      }, 0)
+    app.use(async (ctx) => {
+      return new Promise((resolve) => setTimeout(resolve, 0))
+        .then(() => {
+          id = rTracer.id()
+          ctx.body = { id }
+        })
     })
 
-    return request(app).get('/test')
+    return request(app.listen()).get('/')
       .then(res => {
         expect(res.statusCode).toBe(200)
         expect(res.body.id).toEqual(id)
       })
   })
 
-  test('generates different ids for concurrent requests with callbacks', () => {
-    const app = Koa()
-    app.use(rTracer.koaMiddleware())
-
-    const ids = {}
-    app.get('/test', (req, res) => {
-      setTimeout(() => {
-        const id = rTracer.id()
-        ids[req.query.reqName] = id
-        res.json({ id })
-      }, 0)
-    })
-
-    return Promise.all([
-      request(app).get('/test')
-        .query({ reqName: 'id1' })
-        .then(res => {
-          expect(res.statusCode).toBe(200)
-          expect(res.body.id.length).toBeGreaterThan(0)
-          return res.body.id
-        }),
-      request(app).get('/test')
-        .query({ reqName: 'id2' })
-        .then(res => {
-          expect(res.statusCode).toBe(200)
-          expect(res.body.id.length).toBeGreaterThan(0)
-          return res.body.id
-        })
-    ]).then(([ id1, id2 ]) => {
-      expect(id1).toEqual(ids['id1'])
-      expect(id2).toEqual(ids['id2'])
-      expect(id1).not.toEqual(id2)
-    })
-  })
-
   test('generates different ids for concurrent requests with promises', () => {
-    const app = Koa()
+    const app = new Koa()
     app.use(rTracer.koaMiddleware())
 
     const ids = {}
-    app.get('/test', (req, res) => {
-      const handle = async () => {
-        await new Promise((resolve) => setTimeout(resolve, 0))
-        const id = rTracer.id()
-        ids[req.query.reqName] = id
-        res.json({ id })
-      }
-      handle()
+    app.use(async (ctx) => {
+      return new Promise((resolve) => setTimeout(resolve, 0))
+        .then(() => {
+          const id = rTracer.id()
+          ids[ctx.request.query.reqName] = id
+          ctx.body = { id }
+        })
     })
 
     return Promise.all([
-      request(app).get('/test')
+      request(app.listen()).get('/')
         .query({ reqName: 'id1' })
         .then(res => {
           expect(res.statusCode).toBe(200)
           expect(res.body.id.length).toBeGreaterThan(0)
           return res.body.id
         }),
-      request(app).get('/test')
+      request(app.listen()).get('/')
         .query({ reqName: 'id2' })
         .then(res => {
           expect(res.statusCode).toBe(200)
@@ -198,28 +185,26 @@ describe('koa-rtracer', () => {
   })
 
   test('generates different ids for concurrent requests with async/await', () => {
-    const app = Koa()
+    const app = new Koa()
     app.use(rTracer.koaMiddleware())
 
     const ids = {}
-    app.get('/test', (req, res) => {
-      new Promise((resolve) => setTimeout(resolve, 0))
-        .then(() => {
-          const id = rTracer.id()
-          ids[req.query.reqName] = id
-          res.json({ id })
-        })
+    app.use(async (ctx) => {
+      await new Promise((resolve) => setTimeout(resolve, 0))
+      const id = rTracer.id()
+      ids[ctx.request.query.reqName] = id
+      ctx.body = { id }
     })
 
     return Promise.all([
-      request(app).get('/test')
+      request(app.listen()).get('/')
         .query({ reqName: 'id1' })
         .then(res => {
           expect(res.statusCode).toBe(200)
           expect(res.body.id.length).toBeGreaterThan(0)
           return res.body.id
         }),
-      request(app).get('/test')
+      request(app.listen()).get('/')
         .query({ reqName: 'id2' })
         .then(res => {
           expect(res.statusCode).toBe(200)
