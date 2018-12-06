@@ -5,7 +5,7 @@
 
 # cls-rtracer
 
-Request Tracer - Express and Koa middlewares for CLS-based request id generation, batteries included. An out-of-the-box solution for adding request ids into your logs.
+Request Tracer - Express and Koa middlewares for CLS-based request id generation, batteries included. An out-of-the-box solution for adding request ids into your logs. Check out a [Medium post](https://medium.com/@apechkurov/request-id-tracing-in-node-js-applications-c517c7dab62d) that describes the rationale behind this library.
 
 Automatically generates a UUID value as the id for each request and stores it in Continuation-Local Storage (CLS, see [cls-hooked](https://github.com/jeff-lewis/cls-hooked)). Optionally, if the request contains `X-Request-Id` header, uses its value instead. Allows to obtain the generated request id anywhere in your routes later and use it for logging or any other purposes.
 
