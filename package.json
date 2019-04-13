@@ -1,6 +1,6 @@
 {
   "name": "cls-rtracer",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "description": "Express and Koa middlewares for CLS-based request id generation, batteries included",
   "author": "Andrey Pechkurov",
   "license": "MIT",
@@ -34,16 +34,19 @@
     "logging"
   ],
   "dependencies": {
-    "cls-hooked": "^4.2.2",
     "uuid": "^3.3.2"
   },
   "devDependencies": {
-    "coveralls": "^3.0.2",
+    "cls-hooked": "^4.2.2",
+    "coveralls": "^3.0.3",
     "express": "^4.16.4",
-    "jest": "^23.6.0",
-    "koa": "^2.6.2",
+    "jest": "^24.7.1",
+    "koa": "^2.7.0",
     "standard": "^12.0.1",
-    "supertest": "^3.3.0",
-    "winston": "^3.1.0"
+    "supertest": "^3.4.2",
+    "winston": "^3.2.1"
+  },
+  "peerDependencies": {
+    "cls-hooked": "^4.2.2"
   }
 }
