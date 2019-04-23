@@ -67,11 +67,7 @@ const koaMiddleware = ({
 /**
  * Returns request tracer id or `undefined` in case if the call is made from an outside CLS context.
  */
-const id = () => {
-  if (ns && ns.active) {
-    return ns.get('requestId')
-  }
-}
+const id = () => ns.get('requestId')
 
 module.exports = {
   expressMiddleware,

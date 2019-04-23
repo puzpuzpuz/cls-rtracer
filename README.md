@@ -16,7 +16,7 @@ Tested and works fine with Express v4 and Koa v2.
 Install:
 
 ```bash
-npm install --save cls-rtracer
+npm install --save cls-rtracer cls-hooked
 ```
 
 ## How to use it - Step 2 (Express users)
