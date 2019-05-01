@@ -5,7 +5,7 @@
 
 # cls-rtracer
 
-Request Tracer - Express and Koa middlewares for CLS-based request id generation, batteries included. An out-of-the-box solution for adding request ids into your logs. Check out a [Medium post](https://medium.com/@apechkurov/request-id-tracing-in-node-js-applications-c517c7dab62d) that describes the rationale behind this library.
+Request Tracer - Express and Koa middlewares for CLS-based request id generation, batteries included. An out-of-the-box solution for adding request ids into your logs. Check out [this Medium post](https://medium.com/@apechkurov/request-id-tracing-in-node-js-applications-c517c7dab62d) that describes the rationale behind `cls-rtracer`.
 
 Automatically generates a UUID value as the id for each request and stores it in Continuation-Local Storage (CLS, see [cls-hooked](https://github.com/jeff-lewis/cls-hooked)). Optionally, if the request contains `X-Request-Id` header, uses its value instead. Allows to obtain the generated request id anywhere in your routes later and use it for logging or any other purposes.
 
@@ -18,6 +18,8 @@ Install:
 ```bash
 npm install --save cls-rtracer cls-hooked
 ```
+
+Note: `cls-hooked` has to be installed explicitly, as it's a [peer dependency](https://nodejs.org/es/blog/npm/peer-dependencies/) for this library.
 
 ## How to use it - Step 2 (Express users)
 
@@ -121,7 +123,7 @@ async function find (entityId) {
 
 The main use case for this library is request id generation and logging automation. You can integrate with any logger library in a single place and get request ids in logs across your Express application.
 
-Without having a request id, as a correlation value, in your logs, you will not be able to determine which log entries belong to the process of handling the same request. You could generate a request id manually and store it in the Express' `req` or Koa's `ctx` objects, but then you will have to explicitly pass the object into all other modules on the route. And cls-rtracer comes to the rescue!
+Without having request id, as a correlation value, in your logs, you will not be able to determine which log entries belong to the process of handling the same request. You could generate request id manually and store it in the Express' `req` or Koa's `ctx` objects, but then you will have to explicitly pass the object into all other modules on the route. And `cls-rtracer` comes to the rescue!
 
 Let's consider integration with [winston](https://github.com/winstonjs/winston), one of most popular logging libraries.
 
@@ -169,9 +171,17 @@ To avoid weird behavior:
 
 * Make sure you require `cls-rtracer` as the first dependency in your app. Some popular packages may use async which breaks CLS.
 
-For Node 10 users:
+Note: there is a small chance that you are using one of rare libraries that do not play nice with Async Hooks API, which is internally used by the `cls-hooked` library. So, if you face the issue when CLS context (and thus, the request id) is lost at some point of async calls chain, please submit GitHub issue with a detailed description.
+
+Note for Node 10 users:
 
 * Node 10.0.x-10.3.x is not supported. That's because V8 version 6.6 introduced a bug that breaks async_hooks during async/await. Node 10.4.x uses V8 v6.7 where the bug is fixed. See: https://github.com/nodejs/node/issues/20274.
+
+## Performance impact
+
+Note that this library has a certain performance impact on your application due to CLS (or more precisely, Async Hooks API) usage. So, you need to decide if the benefit of being able to trace requests in logs without any boilerplate is more valuable for you than the disadvantage of performance impact.
+
+The author of this library did some basic performance testing and got about 10–15% RPS (request per second) degradation when `cls-rtracer` is used. See [this post](https://stackoverflow.com/questions/50595130/express-what-load-can-continuation-local-storage-handle/53647537#53647537) for more details.
 
 ## License
 
