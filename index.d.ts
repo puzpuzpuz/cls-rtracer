@@ -6,7 +6,9 @@ export interface IMiddlewareOptions {
   // Default: 'X-Request-Id'
   headerName?: string
 }
+
 export declare const id: () => string | undefined
+
 export declare const expressMiddleware: (
   options?: IMiddlewareOptions,
 ) => (
@@ -14,6 +16,7 @@ export declare const expressMiddleware: (
   res: ServerResponse,
   next: (err?: any) => void,
 ) => void
+
 export declare const koaMiddleware: (
   options?: IMiddlewareOptions,
 ) => (
