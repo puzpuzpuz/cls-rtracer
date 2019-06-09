@@ -21,6 +21,8 @@ npm install --save cls-rtracer cls-hooked
 
 Note: `cls-hooked` has to be installed explicitly, as it's a [peer dependency](https://nodejs.org/es/blog/npm/peer-dependencies/) for this library.
 
+Note for TypeScript users: typings are included.
+
 ## How to use it - Step 2 (Express users)
 
 Use the middleware provided by the library before the first middleware that needs to have access to request ids. Note that some middlewares, e.g. body-parser or express-jwt, may cause CLS context to get lost. To avoid such issues, you should use any third party middleware that does not need access to request ids *before* you use this middleware.
