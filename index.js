@@ -105,6 +105,7 @@ const id = () => ns.get('requestId')
 
 module.exports = {
   expressMiddleware,
+  fastifyMiddleware: expressMiddleware,
   koaMiddleware,
   koaV1Middleware,
   id

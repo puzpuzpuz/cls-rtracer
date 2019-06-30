@@ -37,6 +37,7 @@
   },
   "keywords": [
     "express",
+    "fastify",
     "koa",
     "cls",
     "request",
@@ -50,6 +51,7 @@
     "cls-hooked": "^4.2.2",
     "coveralls": "^3.0.3",
     "express": "^4.16.4",
+    "fastify": "^2.6.0",
     "jest": "^24.7.1",
     "koa": "^2.7.0",
     "koav1": "npm:koa@^1.6.2",
