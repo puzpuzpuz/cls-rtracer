@@ -49,6 +49,9 @@ const koaMiddleware = ({
   headerName = 'X-Request-Id'
 } = {}) => {
   return (ctx, next) => {
+    ns.bindEmitter(ctx.req)
+    ns.bindEmitter(ctx.res)
+
     let requestId
     if (useHeader) {
       requestId = ctx.request.headers[headerName.toLowerCase()]
@@ -56,8 +59,6 @@ const koaMiddleware = ({
     requestId = requestId || uuidv4()
 
     return new Promise(ns.bind((resolve, reject) => {
-      ns.bindEmitter(ctx.req)
-      ns.bindEmitter(ctx.res)
       ns.set('requestId', requestId)
       return next().then(resolve).catch(reject)
     }))
@@ -77,8 +78,8 @@ const koaV1Middleware = ({
   headerName = 'X-Request-Id'
 } = {}) => {
   return function * (next) {
-    // ns.bindEmitter(this.ctx.req)
-    // ns.bindEmitter(this.ctx.res)
+    ns.bindEmitter(this.req)
+    ns.bindEmitter(this.res)
 
     const clsCtx = ns.createContext()
     ns.enter(clsCtx)
