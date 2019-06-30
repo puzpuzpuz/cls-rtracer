@@ -26,6 +26,4 @@ export declare const koaMiddleware: (
 
 export declare const koaV1Middleware: (
   options?: IMiddlewareOptions,
-) => (
-  next: Generator,
-) => Generator
+) => GeneratorFunction
