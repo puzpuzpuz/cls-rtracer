@@ -1,7 +1,10 @@
 /* global describe, test, expect */
 'use strict'
 
-const Koa = require('koa')
+const niv = require('npm-install-version')
+niv.install('koa@1.6.2')
+
+const Koa = require('koa@1.6.2')
 const request = require('supertest')
 
 const rTracer = require('../index')
@@ -14,13 +17,13 @@ describe('cls-rtracer for Koa', () => {
 
   test('generates id for request', () => {
     const app = new Koa()
-    app.use(rTracer.koaMiddleware())
+    app.use(rTracer.koaV1Middleware())
 
     let id
 
-    app.use((ctx) => {
+    app.use(function * () {
       id = rTracer.id()
-      ctx.body = { id }
+      this.body = { id }
     })
 
     return request(app.callback()).get('/')
@@ -33,13 +36,13 @@ describe('cls-rtracer for Koa', () => {
 
   test('ignores header by default', () => {
     const app = new Koa()
-    app.use(rTracer.koaMiddleware())
+    app.use(rTracer.koaV1Middleware())
 
     const idInHead = 'id-from-header'
 
-    app.use((ctx) => {
+    app.use(function * () {
       const id = rTracer.id()
-      ctx.body = { id }
+      this.body = { id }
     })
 
     return request(app.callback()).get('/')
@@ -53,13 +56,13 @@ describe('cls-rtracer for Koa', () => {
 
   test('uses default header in case of override', () => {
     const app = new Koa()
-    app.use(rTracer.koaMiddleware({ useHeader: true }))
+    app.use(rTracer.koaV1Middleware({ useHeader: true }))
 
     const idInHead = 'id-from-header'
 
-    app.use((ctx) => {
+    app.use(function * () {
       const id = rTracer.id()
-      ctx.body = { id }
+      this.body = { id }
     })
 
     return request(app.callback()).get('/')
@@ -72,16 +75,16 @@ describe('cls-rtracer for Koa', () => {
 
   test('uses different header in case of override', () => {
     const app = new Koa()
-    app.use(rTracer.koaMiddleware({
+    app.use(rTracer.koaV1Middleware({
       useHeader: true,
       headerName: 'x-another-req-id'
     }))
 
     const idInHead = 'id-from-header'
 
-    app.use((ctx) => {
+    app.use(function * () {
       const id = rTracer.id()
-      ctx.body = { id }
+      this.body = { id }
     })
 
     return request(app.callback()).get('/')
@@ -94,11 +97,11 @@ describe('cls-rtracer for Koa', () => {
 
   test('ignores header if empty', () => {
     const app = new Koa()
-    app.use(rTracer.koaMiddleware({ useHeader: true }))
+    app.use(rTracer.koaV1Middleware({ useHeader: true }))
 
-    app.use((ctx) => {
+    app.use(function * () {
       const id = rTracer.id()
-      ctx.body = { id }
+      this.body = { id }
     })
 
     return request(app.callback()).get('/')
@@ -111,13 +114,13 @@ describe('cls-rtracer for Koa', () => {
 
   test('ignores header if disabled', () => {
     const app = new Koa()
-    app.use(rTracer.koaMiddleware({ useHeader: false }))
+    app.use(rTracer.koaV1Middleware({ useHeader: false }))
 
     const idInHead = 'id-from-header'
 
-    app.use((ctx) => {
+    app.use(function * () {
       const id = rTracer.id()
-      ctx.body = { id }
+      this.body = { id }
     })
 
     return request(app.callback()).get('/')
@@ -131,16 +134,15 @@ describe('cls-rtracer for Koa', () => {
 
   test('generates id for request with promise', () => {
     const app = new Koa()
-    app.use(rTracer.koaMiddleware())
+    app.use(rTracer.koaV1Middleware())
 
     let id
 
-    app.use(async (ctx) => {
-      return new Promise((resolve) => setTimeout(resolve, 0))
-        .then(() => {
-          id = rTracer.id()
-          ctx.body = { id }
-        })
+    app.use(function * () {
+      yield new Promise((resolve) => setTimeout(resolve, 0))
+
+      id = rTracer.id()
+      this.body = { id }
     })
 
     return request(app.callback()).get('/')
@@ -153,16 +155,15 @@ describe('cls-rtracer for Koa', () => {
 
   test('generates different ids for concurrent requests with promises', () => {
     const app = new Koa()
-    app.use(rTracer.koaMiddleware())
+    app.use(rTracer.koaV1Middleware())
 
     const ids = {}
-    app.use(async (ctx) => {
-      return new Promise((resolve) => setTimeout(resolve, 0))
-        .then(() => {
-          const id = rTracer.id()
-          ids[ctx.request.query.reqName] = id
-          ctx.body = { id }
-        })
+    app.use(function * () {
+      yield new Promise((resolve) => setTimeout(resolve, 0))
+
+      const id = rTracer.id()
+      ids[this.request.query.reqName] = id
+      this.body = { id }
     })
 
     const server = request(app.callback())
@@ -190,14 +191,15 @@ describe('cls-rtracer for Koa', () => {
 
   test('generates different ids for concurrent requests with async/await', () => {
     const app = new Koa()
-    app.use(rTracer.koaMiddleware())
+    app.use(rTracer.koaV1Middleware())
 
     const ids = {}
-    app.use(async (ctx) => {
-      await new Promise((resolve) => setTimeout(resolve, 0))
+    app.use(function * () {
+      yield new Promise((resolve) => setTimeout(resolve, 0))
+
       const id = rTracer.id()
-      ids[ctx.request.query.reqName] = id
-      ctx.body = { id }
+      ids[this.request.query.reqName] = id
+      this.body = { id }
     })
 
     const server = request(app.callback())

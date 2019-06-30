@@ -27,6 +27,7 @@ describe('cls-rtracer for Express', () => {
       .then(res => {
         expect(res.statusCode).toBe(200)
         expect(res.body.id).toEqual(id)
+        expect(res.body.id.length).toBeGreaterThan(0)
       })
   })
 
@@ -45,6 +46,7 @@ describe('cls-rtracer for Express', () => {
       .set('X-Request-Id', idInHead)
       .then(res => {
         expect(res.statusCode).toBe(200)
+        expect(res.body.id.length).toBeGreaterThan(0)
         expect(res.body.id).not.toEqual(idInHead)
       })
   })
@@ -144,6 +146,7 @@ describe('cls-rtracer for Express', () => {
       .then(res => {
         expect(res.statusCode).toBe(200)
         expect(res.body.id).toEqual(id)
+        expect(res.body.id.length).toBeGreaterThan(0)
       })
   })
 

@@ -150,7 +150,7 @@ const logger = createLogger({
 })
 ```
 
-Complete examples for both Express and Koa are available in `/examples/` directory.
+Complete samples for both Express and Koa are available in `/samples/` directory.
 
 ## Middleware configuration
 
