@@ -6,7 +6,7 @@ const request = require('supertest')
 
 const rTracer = require('../index')
 
-describe('cls-rtracer for Koa', () => {
+describe('cls-rtracer for Koa v1', () => {
   test('does not return id outside of request', () => {
     const id = rTracer.id()
     expect(id).toBeUndefined()
