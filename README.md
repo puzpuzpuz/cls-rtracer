@@ -5,11 +5,11 @@
 
 # cls-rtracer
 
-Request Tracer - Express and Koa middlewares for CLS-based request id generation, batteries included. An out-of-the-box solution for adding request ids into your logs. Check out [this Medium post](https://medium.com/@apechkurov/request-id-tracing-in-node-js-applications-c517c7dab62d) that describes the rationale behind `cls-rtracer`.
+Request Tracer - Express, Fastify and Koa middlewares for CLS-based request id generation, batteries included. An out-of-the-box solution for adding request ids into your logs. Check out [this Medium post](https://medium.com/@apechkurov/request-id-tracing-in-node-js-applications-c517c7dab62d) that describes the rationale behind `cls-rtracer`.
 
 Automatically generates a UUID value as the id for each request and stores it in Continuation-Local Storage (CLS, see [cls-hooked](https://github.com/jeff-lewis/cls-hooked)). Optionally, if the request contains `X-Request-Id` header, uses its value instead. Allows to obtain the generated request id anywhere in your routes later and use it for logging or any other purposes.
 
-Tested and works fine with Express v4 and Koa (both v1 and v2).
+Tested and works fine with Express v4, Fastify v2 and Koa (both v1 and v2).
 
 ## How to use it - Step 1
 
@@ -63,6 +63,53 @@ app.get('/api/v1/entity/{id}', (req, res, next) => {
 ```
 
 You can access the same request id from code that does not have access to the Express' `req` object.
+
+```javascript
+// an imaginary entity-service.js
+async function find (entityId) {
+  // you can obtain the request id here
+  const requestId = rTracer.id()
+  // ...
+}
+```
+
+## How to use it - Step 2 (Fastify users)
+
+Use the middleware provided by the library before the first middleware that needs to have access to request ids. Note that some middlewares may cause CLS context to get lost. To avoid such issues, you should use any third party middleware that does not need access to request ids *before* you use this middleware.
+
+```javascript
+const fastify = require('fastify')()
+const rTracer = require('cls-rtracer')
+
+// any third party middleware that does not need access to request ids goes here
+// ...
+
+fastify.use(rTracer.koaMiddleware())
+// optionally, you can override default middleware config:
+// fastify.use(rTracer.koaMiddleware({
+//   useHeader: true,
+//   headerName: 'X-Your-Request-Header'
+// }))
+
+// all code in middlewares, starting from here, has access to request ids
+```
+
+Obtain request id in middlewares on the incoming request:
+
+```javascript
+// an example middleware for a generic find entity endpoint
+// router config is skipped for the sake of simplicity
+app.get('/test', async (request, reply) => {
+  const entity = await entityService.find(request.params.id)
+  // you can obtain the request id here
+  const requestId = rTracer.id()
+  console.log(`requestId: ${requestId}`)
+
+  reply.send(entity)
+})
+```
+
+You can access the same request id from code that does not have access to the Fastify's `request` object.
 
 ```javascript
 // an imaginary entity-service.js
@@ -129,7 +176,7 @@ For Koa v1 use the `koaV1Middleware(options)` function.
 
 The main use case for this library is request id generation and logging automation. You can integrate with any logger library in a single place and get request ids in logs across your Express application.
 
-Without having request id, as a correlation value, in your logs, you will not be able to determine which log entries belong to the process of handling the same request. You could generate request id manually and store it in the Express' `req` or Koa's `ctx` objects, but then you will have to explicitly pass the object into all other modules on the route. And `cls-rtracer` comes to the rescue!
+Without having request id, as a correlation value, in your logs, you will not be able to determine which log entries belong to the process of handling the same request. You could generate request id manually and store it in the Express' `req` or Fastify's `request` or Koa's `ctx` objects, but then you will have to explicitly pass the object into all other modules on the route. And `cls-rtracer` comes to the rescue!
 
 Let's consider integration with [winston](https://github.com/winstonjs/winston), one of most popular logging libraries.
 
@@ -154,7 +201,7 @@ const logger = createLogger({
 })
 ```
 
-Complete samples for both Express and Koa are available in `/samples/` directory.
+Complete samples for Express and Koa are available in `/samples/` directory.
 
 ## Middleware configuration
 
