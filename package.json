@@ -2,7 +2,16 @@
   "name": "cls-rtracer",
   "version": "1.1.1",
   "description": "Express and Koa middlewares for CLS-based request id generation, batteries included",
-  "author": "Andrey Pechkurov",
+  "author": {
+    "name": "Andrey Pechkurov",
+    "url": "https://github.com/puzpuzpuz"
+  },
+  "contributors": [
+    {
+      "name": "Andrey Goncharov",
+      "url": "https://github.com/keenondrums"
+    }
+  ],
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/puzpuzpuz/cls-rtracer/issues"
