@@ -19,9 +19,8 @@ describe('cls-rtracer for Fastify', () => {
     let id
 
     app.get('/test', async (_, reply) => {
-      reply.type('application/json').code(200)
       id = rTracer.id()
-      return { id }
+      reply.send({ id })
     })
 
     return app.ready().then(() => request(app.server).get('/test'))
@@ -39,9 +38,8 @@ describe('cls-rtracer for Fastify', () => {
     const idInHead = 'id-from-header'
 
     app.get('/test', async (_, reply) => {
-      reply.type('application/json').code(200)
       const id = rTracer.id()
-      return { id }
+      reply.send({ id })
     })
 
     return app.ready()
@@ -60,9 +58,8 @@ describe('cls-rtracer for Fastify', () => {
     const idInHead = 'id-from-header'
 
     app.get('/test', async (_, reply) => {
-      reply.type('application/json').code(200)
       const id = rTracer.id()
-      return { id }
+      reply.send({ id })
     })
 
     return app.ready()
@@ -83,9 +80,8 @@ describe('cls-rtracer for Fastify', () => {
     const idInHead = 'id-from-header'
 
     app.get('/test', async (_, reply) => {
-      reply.type('application/json').code(200)
       const id = rTracer.id()
-      return { id }
+      reply.send({ id })
     })
 
     return app.ready()
@@ -101,9 +97,8 @@ describe('cls-rtracer for Fastify', () => {
     app.use(rTracer.fastifyMiddleware({ useHeader: true }))
 
     app.get('/test', async (_, reply) => {
-      reply.type('application/json').code(200)
       const id = rTracer.id()
-      return { id }
+      reply.send({ id })
     })
 
     return app.ready()
@@ -121,9 +116,8 @@ describe('cls-rtracer for Fastify', () => {
     const idInHead = 'id-from-header'
 
     app.get('/test', async (_, reply) => {
-      reply.type('application/json').code(200)
       const id = rTracer.id()
-      return { id }
+      reply.send({ id })
     })
 
     return app.ready()
@@ -143,9 +137,8 @@ describe('cls-rtracer for Fastify', () => {
 
     app.get('/test', async (_, reply) => {
       await new Promise((resolve) => setTimeout(resolve, 0))
-      reply.type('application/json').code(200)
       id = rTracer.id()
-      return { id }
+      reply.send({ id })
     })
 
     return app.ready().then(() => request(app.server).get('/test'))
@@ -163,10 +156,9 @@ describe('cls-rtracer for Fastify', () => {
     const ids = {}
     app.get('/test', async (request, reply) => {
       await new Promise((resolve) => setTimeout(resolve, 0))
-      reply.type('application/json').code(200)
       const id = rTracer.id()
       ids[request.query.reqName] = id
-      return { id }
+      reply.send({ id })
     })
 
     const server = request(app.server)
@@ -199,10 +191,9 @@ describe('cls-rtracer for Fastify', () => {
     const ids = {}
     app.get('/test', async (request, reply) => {
       await new Promise((resolve) => setTimeout(resolve, 0))
-      reply.type('application/json').code(200)
       const id = rTracer.id()
       ids[request.query.reqName] = id
-      return { id }
+      reply.send({ id })
     })
 
     const server = request(app.server)
@@ -235,10 +226,9 @@ describe('cls-rtracer for Fastify', () => {
     const ids = {}
     app.get('/test', async (request, reply) => {
       await new Promise((resolve) => setTimeout(resolve, 0))
-      reply.type('application/json').code(200)
       const id = rTracer.id()
       ids[request.query.reqName] = id
-      return { id }
+      reply.send({ id })
     })
 
     const server = request(app.server)
