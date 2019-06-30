@@ -1,10 +1,7 @@
 /* global describe, test, expect */
 'use strict'
 
-const niv = require('npm-install-version')
-niv.install('koa@1.6.2')
-
-const Koa = require('koa@1.6.2')
+const Koa = require('koav1')
 const request = require('supertest')
 
 const rTracer = require('../index')
