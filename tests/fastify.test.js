@@ -1,7 +1,7 @@
 /* global describe, test, expect */
 'use strict'
 
-const express = require('express')
+const Fastify = require('fastify')
 const request = require('supertest')
 
 const rTracer = require('../index')
@@ -13,17 +13,18 @@ describe('cls-rtracer for Fastify', () => {
   })
 
   test('generates id for request', () => {
-    const app = express()
-    app.use(rTracer.expressMiddleware())
+    const app = Fastify()
+    app.use(rTracer.fastifyMiddleware())
 
     let id
 
-    app.get('/test', (req, res) => {
+    app.get('/test', async (_, reply) => {
+      reply.type('application/json').code(200)
       id = rTracer.id()
-      res.json({ id })
+      return { id }
     })
 
-    return request(app).get('/test')
+    return app.ready().then(() => request(app.server).get('/test'))
       .then(res => {
         expect(res.statusCode).toBe(200)
         expect(res.body.id).toEqual(id)
@@ -32,18 +33,19 @@ describe('cls-rtracer for Fastify', () => {
   })
 
   test('ignores header by default', () => {
-    const app = express()
-    app.use(rTracer.expressMiddleware())
+    const app = Fastify()
+    app.use(rTracer.fastifyMiddleware())
 
     const idInHead = 'id-from-header'
 
-    app.get('/test', (req, res) => {
+    app.get('/test', async (_, reply) => {
+      reply.type('application/json').code(200)
       const id = rTracer.id()
-      res.json({ id })
+      return { id }
     })
 
-    return request(app).get('/test')
-      .set('X-Request-Id', idInHead)
+    return app.ready()
+      .then(() => request(app.server).get('/test').set('X-Request-Id', idInHead))
       .then(res => {
         expect(res.statusCode).toBe(200)
         expect(res.body.id.length).toBeGreaterThan(0)
@@ -52,18 +54,19 @@ describe('cls-rtracer for Fastify', () => {
   })
 
   test('uses default header in case of override', () => {
-    const app = express()
-    app.use(rTracer.expressMiddleware({ useHeader: true }))
+    const app = Fastify()
+    app.use(rTracer.fastifyMiddleware({ useHeader: true }))
 
     const idInHead = 'id-from-header'
 
-    app.get('/test', (req, res) => {
+    app.get('/test', async (_, reply) => {
+      reply.type('application/json').code(200)
       const id = rTracer.id()
-      res.json({ id })
+      return { id }
     })
 
-    return request(app).get('/test')
-      .set('X-Request-Id', idInHead)
+    return app.ready()
+      .then(() => request(app.server).get('/test').set('X-Request-Id', idInHead))
       .then(res => {
         expect(res.statusCode).toBe(200)
         expect(res.body.id).toEqual(idInHead)
@@ -71,21 +74,22 @@ describe('cls-rtracer for Fastify', () => {
   })
 
   test('uses different header in case of override', () => {
-    const app = express()
-    app.use(rTracer.expressMiddleware({
+    const app = Fastify()
+    app.use(rTracer.fastifyMiddleware({
       useHeader: true,
       headerName: 'x-another-req-id'
     }))
 
     const idInHead = 'id-from-header'
 
-    app.get('/test', (req, res) => {
+    app.get('/test', async (_, reply) => {
+      reply.type('application/json').code(200)
       const id = rTracer.id()
-      res.json({ id })
+      return { id }
     })
 
-    return request(app).get('/test')
-      .set('x-another-req-id', idInHead)
+    return app.ready()
+      .then(() => request(app.server).get('/test').set('x-another-req-id', idInHead))
       .then(res => {
         expect(res.statusCode).toBe(200)
         expect(res.body.id).toEqual(idInHead)
@@ -93,16 +97,17 @@ describe('cls-rtracer for Fastify', () => {
   })
 
   test('ignores header if empty', () => {
-    const app = express()
-    app.use(rTracer.expressMiddleware({ useHeader: true }))
+    const app = Fastify()
+    app.use(rTracer.fastifyMiddleware({ useHeader: true }))
 
-    app.get('/test', (req, res) => {
+    app.get('/test', async (_, reply) => {
+      reply.type('application/json').code(200)
       const id = rTracer.id()
-      res.json({ id })
+      return { id }
     })
 
-    return request(app).get('/test')
-      .set('X-Request-Id', '')
+    return app.ready()
+      .then(() => request(app.server).get('/test').set('X-Request-Id', ''))
       .then(res => {
         expect(res.statusCode).toBe(200)
         expect(res.body.id.length).toBeGreaterThan(0)
@@ -110,18 +115,19 @@ describe('cls-rtracer for Fastify', () => {
   })
 
   test('ignores header if disabled', () => {
-    const app = express()
-    app.use(rTracer.expressMiddleware({ useHeader: false }))
+    const app = Fastify()
+    app.use(rTracer.fastifyMiddleware({ useHeader: false }))
 
     const idInHead = 'id-from-header'
 
-    app.get('/test', (req, res) => {
+    app.get('/test', async (_, reply) => {
+      reply.type('application/json').code(200)
       const id = rTracer.id()
-      res.json({ id })
+      return { id }
     })
 
-    return request(app).get('/test')
-      .set('X-Request-Id', idInHead)
+    return app.ready()
+      .then(() => request(app.server).get('/test').set('X-Request-Id', idInHead))
       .then(res => {
         expect(res.statusCode).toBe(200)
         expect(res.body.id).not.toEqual(idInHead)
@@ -130,19 +136,19 @@ describe('cls-rtracer for Fastify', () => {
   })
 
   test('generates id for request with callback', () => {
-    const app = express()
-    app.use(rTracer.expressMiddleware())
+    const app = Fastify()
+    app.use(rTracer.fastifyMiddleware())
 
     let id
 
-    app.get('/test', (req, res) => {
-      setTimeout(() => {
-        id = rTracer.id()
-        res.json({ id })
-      }, 0)
+    app.get('/test', async (_, reply) => {
+      await new Promise((resolve) => setTimeout(resolve, 0))
+      reply.type('application/json').code(200)
+      id = rTracer.id()
+      return { id }
     })
 
-    return request(app).get('/test')
+    return app.ready().then(() => request(app.server).get('/test'))
       .then(res => {
         expect(res.statusCode).toBe(200)
         expect(res.body.id).toEqual(id)
@@ -151,20 +157,20 @@ describe('cls-rtracer for Fastify', () => {
   })
 
   test('generates different ids for concurrent requests with callbacks', () => {
-    const app = express()
-    app.use(rTracer.expressMiddleware())
+    const app = Fastify()
+    app.use(rTracer.fastifyMiddleware())
 
     const ids = {}
-    app.get('/test', (req, res) => {
-      setTimeout(() => {
-        const id = rTracer.id()
-        ids[req.query.reqName] = id
-        res.json({ id })
-      }, 0)
+    app.get('/test', async (request, reply) => {
+      await new Promise((resolve) => setTimeout(resolve, 0))
+      reply.type('application/json').code(200)
+      const id = rTracer.id()
+      ids[request.query.reqName] = id
+      return { id }
     })
 
-    const server = request(app)
-    return Promise.all([
+    const server = request(app.server)
+    return app.ready().then(() => Promise.all([
       server.get('/test')
         .query({ reqName: 'id1' })
         .then(res => {
@@ -179,7 +185,7 @@ describe('cls-rtracer for Fastify', () => {
           expect(res.body.id.length).toBeGreaterThan(0)
           return res.body.id
         })
-    ]).then(([ id1, id2 ]) => {
+    ])).then(([ id1, id2 ]) => {
       expect(id1).toEqual(ids['id1'])
       expect(id2).toEqual(ids['id2'])
       expect(id1).not.toEqual(id2)
@@ -187,21 +193,20 @@ describe('cls-rtracer for Fastify', () => {
   })
 
   test('generates different ids for concurrent requests with promises', () => {
-    const app = express()
-    app.use(rTracer.expressMiddleware())
+    const app = Fastify()
+    app.use(rTracer.fastifyMiddleware())
 
     const ids = {}
-    app.get('/test', (req, res) => {
-      new Promise((resolve) => setTimeout(resolve, 0))
-        .then(() => {
-          const id = rTracer.id()
-          ids[req.query.reqName] = id
-          res.json({ id })
-        })
+    app.get('/test', async (request, reply) => {
+      await new Promise((resolve) => setTimeout(resolve, 0))
+      reply.type('application/json').code(200)
+      const id = rTracer.id()
+      ids[request.query.reqName] = id
+      return { id }
     })
 
-    const server = request(app)
-    return Promise.all([
+    const server = request(app.server)
+    return app.ready().then(() => Promise.all([
       server.get('/test')
         .query({ reqName: 'id1' })
         .then(res => {
@@ -216,7 +221,7 @@ describe('cls-rtracer for Fastify', () => {
           expect(res.body.id.length).toBeGreaterThan(0)
           return res.body.id
         })
-    ]).then(([ id1, id2 ]) => {
+    ])).then(([ id1, id2 ]) => {
       expect(id1).toEqual(ids['id1'])
       expect(id2).toEqual(ids['id2'])
       expect(id1).not.toEqual(id2)
@@ -224,19 +229,20 @@ describe('cls-rtracer for Fastify', () => {
   })
 
   test('generates different ids for concurrent requests with async/await', () => {
-    const app = express()
-    app.use(rTracer.expressMiddleware())
+    const app = Fastify()
+    app.use(rTracer.fastifyMiddleware())
 
     const ids = {}
-    app.get('/test', async (req, res) => {
+    app.get('/test', async (request, reply) => {
       await new Promise((resolve) => setTimeout(resolve, 0))
+      reply.type('application/json').code(200)
       const id = rTracer.id()
-      ids[req.query.reqName] = id
-      res.json({ id })
+      ids[request.query.reqName] = id
+      return { id }
     })
 
-    const server = request(app)
-    return Promise.all([
+    const server = request(app.server)
+    return app.ready().then(() => Promise.all([
       server.get('/test')
         .query({ reqName: 'id1' })
         .then(res => {
@@ -251,7 +257,7 @@ describe('cls-rtracer for Fastify', () => {
           expect(res.body.id.length).toBeGreaterThan(0)
           return res.body.id
         })
-    ]).then(([ id1, id2 ]) => {
+    ])).then(([ id1, id2 ]) => {
       expect(id1).toEqual(ids['id1'])
       expect(id2).toEqual(ids['id2'])
       expect(id1).not.toEqual(id2)
