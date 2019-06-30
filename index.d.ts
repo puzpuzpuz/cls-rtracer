@@ -23,3 +23,9 @@ export declare const koaMiddleware: (
   ctx: { request: IncomingMessage; response: ServerResponse },
   next: () => Promise<void>,
 ) => Promise<void>
+
+export declare const koaV1Middleware: (
+  options?: IMiddlewareOptions,
+) => (
+  next: Generator,
+) => Generator
