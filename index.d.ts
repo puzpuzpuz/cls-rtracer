@@ -17,6 +17,14 @@ export declare const expressMiddleware: (
   next: (err?: any) => void,
 ) => void
 
+export declare const fastifyMiddleware: (
+  options?: IMiddlewareOptions,
+) => (
+  req: IncomingMessage,
+  res: ServerResponse,
+  next: (err?: any) => void,
+) => void
+
 export declare const koaMiddleware: (
   options?: IMiddlewareOptions,
 ) => (
