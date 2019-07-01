@@ -84,9 +84,9 @@ const rTracer = require('cls-rtracer')
 // any third party middleware that does not need access to request ids goes here
 // ...
 
-fastify.use(rTracer.koaMiddleware())
+fastify.use(rTracer.fastifyMiddleware())
 // optionally, you can override default middleware config:
-// fastify.use(rTracer.koaMiddleware({
+// fastify.use(rTracer.fastifyMiddleware({
 //   useHeader: true,
 //   headerName: 'X-Your-Request-Header'
 // }))
