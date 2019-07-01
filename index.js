@@ -37,7 +37,7 @@ const expressMiddleware = ({
 }
 
 /**
- * Generates a request tracer middleware for Koa.
+ * Generates a request tracer middleware for Koa v2.
  * @param {Object} options possible options
  * @param {boolean} options.useHeader respect request header flag
  *                                    (default: `false`)
@@ -49,6 +49,9 @@ const koaMiddleware = ({
   headerName = 'X-Request-Id'
 } = {}) => {
   return (ctx, next) => {
+    ns.bindEmitter(ctx.req)
+    ns.bindEmitter(ctx.res)
+
     let requestId
     if (useHeader) {
       requestId = ctx.request.headers[headerName.toLowerCase()]
@@ -56,11 +59,42 @@ const koaMiddleware = ({
     requestId = requestId || uuidv4()
 
     return new Promise(ns.bind((resolve, reject) => {
-      ns.bindEmitter(ctx.req)
-      ns.bindEmitter(ctx.res)
       ns.set('requestId', requestId)
       return next().then(resolve).catch(reject)
     }))
+  }
+}
+
+/**
+ * Generates a request tracer middleware for Koa v1.
+ * @param {Object} options possible options
+ * @param {boolean} options.useHeader respect request header flag
+ *                                    (default: `false`)
+ * @param {string} options.headerName request header name, used if `useHeader` is set to `true`
+ *                                    (default: `X-Request-Id`)
+ */
+const koaV1Middleware = ({
+  useHeader = false,
+  headerName = 'X-Request-Id'
+} = {}) => {
+  return function * (next) {
+    ns.bindEmitter(this.req)
+    ns.bindEmitter(this.res)
+
+    const clsCtx = ns.createContext()
+    ns.enter(clsCtx)
+    try {
+      let requestId
+      if (useHeader) {
+        requestId = this.request.headers[headerName.toLowerCase()]
+      }
+      requestId = requestId || uuidv4()
+      ns.set('requestId', requestId)
+
+      yield next
+    } finally {
+      ns.exit(clsCtx)
+    }
   }
 }
 
@@ -72,5 +106,6 @@ const id = () => ns.get('requestId')
 module.exports = {
   expressMiddleware,
   koaMiddleware,
+  koaV1Middleware,
   id
 }

@@ -5,7 +5,7 @@ node_js:
   - "9.5.0"
   - "10.4"
 before_install:
-  - npm i -g npm@^5.7.0
+  - npm i -g npm@^6.9.0
 install:
   - npm install
 script:
