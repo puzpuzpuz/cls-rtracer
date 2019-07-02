@@ -201,7 +201,7 @@ const logger = createLogger({
 })
 ```
 
-Complete samples for Express and Koa are available in `/samples/` directory.
+Complete samples for Express, Fastify and Koa are available in `/samples/` directory.
 
 ## Middleware configuration
 
