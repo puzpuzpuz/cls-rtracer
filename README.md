@@ -133,7 +133,7 @@ const init = async () => {
     port: 3000,
     host: 'localhost'
   })
-  // any third party plugins that does not need access to request ids goes here
+  // any third party plugin that does not need access to request ids goes here
   // ...
 
   await server.register({
