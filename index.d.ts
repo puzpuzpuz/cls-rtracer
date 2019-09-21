@@ -7,8 +7,10 @@ export interface IOptions {
   headerName?: string
 }
 
-export interface HapiPlugin<T> {
-  register: (server: object, options: T) => void | Promise<void>;
+export interface IHapiPlugin<T> {
+  name: string
+  once: boolean
+  register: (server: any, options: T) => void | Promise<void>
 }
 
 export declare const id: () => string | undefined
@@ -40,4 +42,4 @@ export declare const koaV1Middleware: (
   options?: IOptions,
 ) => GeneratorFunction
 
-export declare const hapiPlugin: HapiPlugin<IOptions>
+export declare const hapiPlugin: IHapiPlugin<IOptions>

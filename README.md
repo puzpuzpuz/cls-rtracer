@@ -120,6 +120,58 @@ async function find (entityId) {
 }
 ```
 
+## How to use it - Step 2 (Koa users)
+
+Use the middleware provided by the library before the first middleware that needs to have access to request ids. Note that some middlewares may cause CLS context to get lost. To avoid such issues, you should use any third party middleware that does not need access to request ids *before* you use this middleware.
+
+```javascript
+const Koa = require('koa')
+const rTracer = require('cls-rtracer')
+
+const app = new Koa()
+// any third party middleware that does not need access to request ids goes here
+// ...
+
+app.use(rTracer.koaMiddleware())
+// optionally, you can override default middleware config:
+// app.use(rTracer.koaMiddleware({
+//   useHeader: true,
+//   headerName: 'X-Your-Request-Header'
+// }))
+
+// all code in middlewares, starting from here, has access to request ids
+```
+
+Obtain request id in middlewares on the incoming request:
+
+```javascript
+// an example middleware for a generic find entity endpoint
+// router config is skipped for the sake of simplicity
+app.use(async (ctx) => {
+  const entity = await entityService.find(req.params.id)
+  // you can obtain the request id here
+  const requestId = rTracer.id()
+  console.log(`requestId: ${requestId}`)
+
+  ctx.body = entity
+})
+```
+
+You can access the same request id from code that does not have access to the Koa's `ctx` object.
+
+```javascript
+// an imaginary entity-service.js
+async function find (entityId) {
+  // you can obtain the request id here
+  const requestId = rTracer.id()
+  // ...
+}
+```
+
+### Koa v1 support
+
+For Koa v1 use the `koaV1Middleware(options)` function.
+
 ## How to use it - Step 2 (Hapi users)
 
 Use the plugin provided by the library before the first route that needs to have access to request ids. Note that some plugins may cause CLS context to get lost. To avoid such issues, you should use any third party plugins that does not need access to request ids *before* you register this plugin.
@@ -183,58 +235,6 @@ async function find (entityId) {
   // ...
 }
 ```
-
-## How to use it - Step 2 (Koa users)
-
-Use the middleware provided by the library before the first middleware that needs to have access to request ids. Note that some middlewares may cause CLS context to get lost. To avoid such issues, you should use any third party middleware that does not need access to request ids *before* you use this middleware.
-
-```javascript
-const Koa = require('koa')
-const rTracer = require('cls-rtracer')
-
-const app = new Koa()
-// any third party middleware that does not need access to request ids goes here
-// ...
-
-app.use(rTracer.koaMiddleware())
-// optionally, you can override default middleware config:
-// app.use(rTracer.koaMiddleware({
-//   useHeader: true,
-//   headerName: 'X-Your-Request-Header'
-// }))
-
-// all code in middlewares, starting from here, has access to request ids
-```
-
-Obtain request id in middlewares on the incoming request:
-
-```javascript
-// an example middleware for a generic find entity endpoint
-// router config is skipped for the sake of simplicity
-app.use(async (ctx) => {
-  const entity = await entityService.find(req.params.id)
-  // you can obtain the request id here
-  const requestId = rTracer.id()
-  console.log(`requestId: ${requestId}`)
-
-  ctx.body = entity
-})
-```
-
-You can access the same request id from code that does not have access to the Koa's `ctx` object.
-
-```javascript
-// an imaginary entity-service.js
-async function find (entityId) {
-  // you can obtain the request id here
-  const requestId = rTracer.id()
-  // ...
-}
-```
-
-### Koa v1 support
-
-For Koa v1 use the `koaV1Middleware(options)` function.
 
 ## Integration with loggers
 
