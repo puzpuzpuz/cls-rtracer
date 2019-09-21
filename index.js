@@ -2,6 +2,7 @@
 
 const cls = require('cls-hooked')
 const uuidv4 = require('uuid/v4')
+const pkgJson = require('./package.json')
 
 // generate a unique value for namespace
 const nsid = `rtracer:${uuidv4()}`
@@ -98,6 +99,43 @@ const koaV1Middleware = ({
   }
 }
 
+const hapiPlugin = ({
+  pkg: pkgJson,
+  once: true,
+  register: async (server, options) => {
+    const {
+      useHeader = false,
+      headerName = 'X-Request-Id'
+    } = options
+
+    server.ext('onRequest', (request, h) => {
+      ns.bindEmitter(request.raw.req)
+      ns.bindEmitter(request.raw.res)
+
+      const clsCtx = ns.createContext()
+      ns.enter(clsCtx)
+
+      request.plugins[pkgJson.name] = {
+        context: clsCtx
+      }
+
+      let requestId
+      if (useHeader) {
+        requestId = request.headers[headerName.toLowerCase()]
+      }
+      requestId = requestId || uuidv4()
+      ns.set('requestId', requestId)
+
+      return h.continue
+    })
+
+    server.events.on('response', request => {
+      const clsCtx = request.plugins[pkgJson.name].context
+      ns.exit(clsCtx)
+    })
+  }
+})
+
 /**
  * Returns request tracer id or `undefined` in case if the call is made from an outside CLS context.
  */
@@ -108,5 +146,6 @@ module.exports = {
   fastifyMiddleware: expressMiddleware,
   koaMiddleware,
   koaV1Middleware,
+  hapiPlugin,
   id
 }
