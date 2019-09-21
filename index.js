@@ -2,7 +2,6 @@
 
 const cls = require('cls-hooked')
 const uuidv4 = require('uuid/v4')
-const { name: pkgName } = require('./package.json')
 
 // generate a unique value for namespace
 const nsid = `rtracer:${uuidv4()}`
@@ -99,8 +98,14 @@ const koaV1Middleware = ({
   }
 }
 
+const pluginName = 'cls-rtracer'
+
+/**
+ * A request tracer plugin for Hapi
+ * @type {{once: boolean, name: string, register: hapiPlugin.register}}
+ */
 const hapiPlugin = ({
-  name: pkgName,
+  name: pluginName,
   once: true,
   register: async (server, options) => {
     const {
@@ -115,7 +120,7 @@ const hapiPlugin = ({
       const clsCtx = ns.createContext()
       ns.enter(clsCtx)
 
-      request.plugins[pkgName] = {
+      request.plugins[pluginName] = {
         context: clsCtx
       }
 
@@ -130,7 +135,7 @@ const hapiPlugin = ({
     })
 
     server.events.on('response', request => {
-      const clsCtx = request.plugins[pkgName].context
+      const clsCtx = request.plugins[pluginName].context
       ns.exit(clsCtx)
     })
   }
