@@ -39,6 +39,7 @@
     "express",
     "fastify",
     "koa",
+    "hapi",
     "cls",
     "request",
     "request id",
