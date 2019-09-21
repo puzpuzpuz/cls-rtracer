@@ -7,6 +7,12 @@ export interface IMiddlewareOptions {
   headerName?: string
 }
 
+export interface IHapiPlugin {
+    register: (server: object, options: IMiddlewareOptions) => object,
+    pkg: object,
+    once: boolean,
+}
+
 export declare const id: () => string | undefined
 
 export declare const expressMiddleware: (
@@ -35,3 +41,5 @@ export declare const koaMiddleware: (
 export declare const koaV1Middleware: (
   options?: IMiddlewareOptions,
 ) => GeneratorFunction
+
+export declare const hapiPlugin: IHapiPlugin
