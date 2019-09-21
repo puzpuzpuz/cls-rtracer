@@ -238,11 +238,11 @@ async function find (entityId) {
 
 ## Integration with loggers
 
-The main use case for this library is request id generation and logging automation. You can integrate with any logger library in a single place and get request ids in logs across your Express application.
+The main use case for this library is request id generation and logging automation. You can integrate with any logger library in a single place and get request ids in logs across your application.
 
-Without having request id, as a correlation value, in your logs, you will not be able to determine which log entries belong to the process of handling the same request. You could generate request id manually and store it in the Express' `req` or Fastify's `request` or Koa's `ctx` objects, but then you will have to explicitly pass the object into all other modules on the route. And `cls-rtracer` comes to the rescue!
+Without having request id, as a correlation value, in your logs, you will not be able to determine which log entries belong to code that handles the same request. You could generate request ids manually and store them in the Express' `req` object (or Fastify's `request`, or Koa's `ctx`), but then you will have to explicitly pass the object into all other modules on the route. And that's when `cls-rtracer` comes to the rescue!
 
-Let's consider integration with [winston](https://github.com/winstonjs/winston), one of most popular logging libraries.
+Here is how you can integrate `cls-rtracer` with [winston](https://github.com/winstonjs/winston), one of most popular logging libraries.
 
 ```javascript
 const { createLogger, format, transports } = require('winston')
@@ -276,7 +276,7 @@ These are the available config options for the middleware functions. All config 
   // Respect request header flag (default: false).
   // If set to true, the middleware will be using a value from the specified header (if the value is present).
   useHeader: false,
-  // Request header name, case insensitive (default: X-Request-Id).
+  // Request header name, case insensitive (default: 'X-Request-Id').
   // Used if useHeader is set to true.
   headerName: 'X-Request-Id'
 }
