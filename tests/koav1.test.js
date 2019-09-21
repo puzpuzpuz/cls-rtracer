@@ -185,40 +185,4 @@ describe('cls-rtracer for Koa v1', () => {
       expect(id1).not.toEqual(id2)
     })
   })
-
-  test('generates different ids for concurrent requests with async/await', () => {
-    const app = new Koa()
-    app.use(rTracer.koaV1Middleware())
-
-    const ids = {}
-    app.use(function * () {
-      yield new Promise((resolve) => setTimeout(resolve, 0))
-
-      const id = rTracer.id()
-      ids[this.request.query.reqName] = id
-      this.body = { id }
-    })
-
-    const server = request(app.callback())
-    return Promise.all([
-      server.get('/')
-        .query({ reqName: 'id1' })
-        .then(res => {
-          expect(res.statusCode).toBe(200)
-          expect(res.body.id.length).toBeGreaterThan(0)
-          return res.body.id
-        }),
-      server.get('/')
-        .query({ reqName: 'id2' })
-        .then(res => {
-          expect(res.statusCode).toBe(200)
-          expect(res.body.id.length).toBeGreaterThan(0)
-          return res.body.id
-        })
-    ]).then(([ id1, id2 ]) => {
-      expect(id1).toEqual(ids['id1'])
-      expect(id2).toEqual(ids['id2'])
-      expect(id1).not.toEqual(id2)
-    })
-  })
 })
