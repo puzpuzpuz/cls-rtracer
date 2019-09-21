@@ -98,6 +98,49 @@ const koaV1Middleware = ({
   }
 }
 
+const pluginName = 'cls-rtracer'
+
+/**
+ * A request tracer plugin for Hapi
+ * @type {{once: boolean, name: string, register: hapiPlugin.register}}
+ */
+const hapiPlugin = ({
+  name: pluginName,
+  once: true,
+  register: async (server, options) => {
+    const {
+      useHeader = false,
+      headerName = 'X-Request-Id'
+    } = options
+
+    server.ext('onRequest', (request, h) => {
+      ns.bindEmitter(request.raw.req)
+      ns.bindEmitter(request.raw.res)
+
+      const clsCtx = ns.createContext()
+      ns.enter(clsCtx)
+
+      request.plugins[pluginName] = {
+        context: clsCtx
+      }
+
+      let requestId
+      if (useHeader) {
+        requestId = request.headers[headerName.toLowerCase()]
+      }
+      requestId = requestId || uuidv4()
+      ns.set('requestId', requestId)
+
+      return h.continue
+    })
+
+    server.events.on('response', request => {
+      const clsCtx = request.plugins[pluginName].context
+      ns.exit(clsCtx)
+    })
+  }
+})
+
 /**
  * Returns request tracer id or `undefined` in case if the call is made from an outside CLS context.
  */
@@ -108,5 +151,6 @@ module.exports = {
   fastifyMiddleware: expressMiddleware,
   koaMiddleware,
   koaV1Middleware,
+  hapiPlugin,
   id
 }
