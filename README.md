@@ -19,7 +19,7 @@ Install:
 npm install --save cls-rtracer cls-hooked
 ```
 
-Note: `cls-hooked` has to be installed explicitly, as it's a [peer dependency](https://nodejs.org/es/blog/npm/peer-dependencies/) for this library.
+Note: `cls-hooked` has to be installed explicitly, as it's a [peer dependency](https://nodejs.org/es/blog/npm/peer-dependencies/) for this library. See [this issue](https://github.com/puzpuzpuz/cls-rtracer/issues/18) for more details.
 
 Note for TypeScript users: typings are included.
 
