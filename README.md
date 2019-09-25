@@ -16,10 +16,8 @@ Tested and works fine with Express v4, Fastify v2, Koa (both v1 and v2), and Hap
 Install:
 
 ```bash
-npm install --save cls-rtracer cls-hooked
+npm install --save cls-rtracer
 ```
-
-Note: `cls-hooked` has to be installed explicitly, as it's a [peer dependency](https://nodejs.org/es/blog/npm/peer-dependencies/) for this library.
 
 Note for TypeScript users: typings are included.
 

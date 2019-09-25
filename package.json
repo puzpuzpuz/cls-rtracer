@@ -46,11 +46,11 @@
     "logging"
   ],
   "dependencies": {
+    "cls-hooked": "4.2.2",
     "uuid": "3.3.2"
   },
   "devDependencies": {
     "@hapi/hapi": "^18.4.0",
-    "cls-hooked": "^4.2.2",
     "coveralls": "^3.0.3",
     "express": "^4.16.4",
     "fastify": "^2.6.0",
@@ -60,8 +60,5 @@
     "standard": "^12.0.1",
     "supertest": "^3.4.2",
     "winston": "^3.2.1"
-  },
-  "peerDependencies": {
-    "cls-hooked": "^4.2.2"
   }
 }
