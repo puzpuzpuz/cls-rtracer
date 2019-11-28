@@ -23,9 +23,13 @@ Note: `cls-hooked` has to be installed explicitly, as it's a [peer dependency](h
 
 Note for TypeScript users: typings are included.
 
+## How to use it - Step 2 (Common instructions)
+
+Use the middleware (or plugin) provided by the library before the first middleware that needs to have access to request ids. Note that some middlewares, e.g. express-session, body-parser, or express-jwt, may cause CLS context (i.e. Async Hooks execution path) to get lost. To avoid such issues, you should use any third party middleware that does not need access to request ids *before* you use this middleware. See issue #20 as an example.
+
 ## How to use it - Step 2 (Express users)
 
-Use the middleware provided by the library before the first middleware that needs to have access to request ids. Note that some middlewares, e.g. body-parser or express-jwt, may cause CLS context to get lost. To avoid such issues, you should use any third party middleware that does not need access to request ids *before* you use this middleware.
+Use the middleware provided by the library:
 
 ```javascript
 const express = require('express')
@@ -75,7 +79,7 @@ async function find (entityId) {
 
 ## How to use it - Step 2 (Fastify users)
 
-Use the middleware provided by the library before the first middleware that needs to have access to request ids. Note that some middlewares may cause CLS context to get lost. To avoid such issues, you should use any third party middleware that does not need access to request ids *before* you use this middleware.
+Use the middleware provided by the library:
 
 ```javascript
 const fastify = require('fastify')()
@@ -122,7 +126,7 @@ async function find (entityId) {
 
 ## How to use it - Step 2 (Koa users)
 
-Use the middleware provided by the library before the first middleware that needs to have access to request ids. Note that some middlewares may cause CLS context to get lost. To avoid such issues, you should use any third party middleware that does not need access to request ids *before* you use this middleware.
+Use the middleware provided by the library:
 
 ```javascript
 const Koa = require('koa')
@@ -174,7 +178,7 @@ For Koa v1 use the `koaV1Middleware(options)` function.
 
 ## How to use it - Step 2 (Hapi users)
 
-Use the plugin provided by the library before the first route that needs to have access to request ids. Note that some plugins may cause CLS context to get lost. To avoid such issues, you should use any third party plugins that does not need access to request ids *before* you register this plugin.
+Use the plugin provided by the library:
 
 ```javascript
 const Hapi = require('@hapi/hapi')
@@ -289,6 +293,8 @@ To avoid weird behavior:
 * Make sure you require `cls-rtracer` as the first dependency in your app. Some popular packages may use async which breaks CLS.
 
 Note: there is a small chance that you are using one of rare libraries that do not play nice with Async Hooks API, which is internally used by the `cls-hooked` library. So, if you face the issue when CLS context (and thus, the request id) is lost at some point of async calls chain, please submit GitHub issue with a detailed description.
+
+* Make sure you use any third party middleware (or plugin) that does not need access to request ids *before* you use `cls-rtracer`. See [this section](#how-to-use-it---step-2-common-instructions).
 
 Note for Node 10 users:
 
