@@ -292,9 +292,9 @@ To avoid weird behavior:
 
 * Make sure you require `cls-rtracer` as the first dependency in your app. Some popular packages may use async which breaks CLS.
 
-Note: there is a small chance that you are using one of rare libraries that do not play nice with Async Hooks API, which is internally used by the `cls-hooked` library. So, if you face the issue when CLS context (and thus, the request id) is lost at some point of async calls chain, please submit GitHub issue with a detailed description.
-
 * Make sure you use any third party middleware (or plugin) that does not need access to request ids *before* you use `cls-rtracer`. See [this section](#how-to-use-it---step-2-common-instructions).
+
+Note: there is a small chance that you are using one of rare libraries that do not play nice with Async Hooks API, which is internally used by the `cls-hooked` library. So, if you face the issue when CLS context (and thus, the request id) is lost at some point of async calls chain, please submit GitHub issue with a detailed description.
 
 Note for Node 10 users:
 
