@@ -1,10 +1,10 @@
 'use strict'
 
 const cls = require('cls-hooked')
-const uuidv4 = require('uuid/v4')
+const uuidv1 = require('uuid/v1')
 
 // generate a unique value for namespace
-const nsid = `rtracer:${uuidv4()}`
+const nsid = `rtracer:${uuidv1()}`
 const ns = cls.createNamespace(nsid)
 
 /**
@@ -27,7 +27,7 @@ const expressMiddleware = ({
     if (useHeader) {
       requestId = req.headers[headerName.toLowerCase()]
     }
-    requestId = requestId || uuidv4()
+    requestId = requestId || uuidv1()
 
     ns.run(() => {
       ns.set('requestId', requestId)
@@ -56,7 +56,7 @@ const koaMiddleware = ({
     if (useHeader) {
       requestId = ctx.request.headers[headerName.toLowerCase()]
     }
-    requestId = requestId || uuidv4()
+    requestId = requestId || uuidv1()
 
     return new Promise(ns.bind((resolve, reject) => {
       ns.set('requestId', requestId)
@@ -88,7 +88,7 @@ const koaV1Middleware = ({
       if (useHeader) {
         requestId = this.request.headers[headerName.toLowerCase()]
       }
-      requestId = requestId || uuidv4()
+      requestId = requestId || uuidv1()
       ns.set('requestId', requestId)
 
       yield next
@@ -128,7 +128,7 @@ const hapiPlugin = ({
       if (useHeader) {
         requestId = request.headers[headerName.toLowerCase()]
       }
-      requestId = requestId || uuidv4()
+      requestId = requestId || uuidv1()
       ns.set('requestId', requestId)
 
       return h.continue

@@ -46,7 +46,7 @@
     "logging"
   ],
   "dependencies": {
-    "uuid": "3.3.2"
+    "uuid": "3.3.3"
   },
   "devDependencies": {
     "@hapi/hapi": "^18.4.0",
