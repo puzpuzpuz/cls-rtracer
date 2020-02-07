@@ -222,4 +222,31 @@ describe('cls-rtracer for Koa', () => {
       expect(id1).not.toEqual(id2)
     })
   })
+
+  test('generates custom namespace property for request', () => {
+    const app = new Koa()
+    const propertyName = 'originalUrl'
+
+    app.use(rTracer.koaMiddleware({
+      customNamespacePropertiesBuilder: (request, namespace) => {
+        namespace.set(propertyName, request.url)
+      }
+    }))
+
+    let propertyValue
+
+    const requestUrl = '/test'
+    app.use((ctx) => {
+      propertyValue = rTracer.getNamespaceProperty(propertyName)
+      ctx.body = { propertyValue }
+    })
+
+    return request(app.callback()).get(requestUrl)
+      .then(res => {
+        expect(res.statusCode).toBe(200)
+        expect(propertyValue).toEqual(requestUrl)
+        expect(res.body.propertyValue).toEqual(requestUrl)
+        expect(res.body.propertyValue.length).toBeGreaterThan(0)
+      })
+  })
 })

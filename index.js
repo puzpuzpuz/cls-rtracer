@@ -7,6 +7,12 @@ const uuidv1 = require('uuid/v1')
 const nsid = `rtracer:${uuidv1()}`
 const ns = cls.createNamespace(nsid)
 
+const setupCustomNamespaceProperties = (customNamespacePropertiesBuilder, req) => {
+  if (customNamespacePropertiesBuilder) {
+    customNamespacePropertiesBuilder(req, ns)
+  }
+}
+
 /**
  * Generates a request tracer middleware for Express.
  * @param {Object} options possible options
@@ -17,7 +23,8 @@ const ns = cls.createNamespace(nsid)
  */
 const expressMiddleware = ({
   useHeader = false,
-  headerName = 'X-Request-Id'
+  headerName = 'X-Request-Id',
+  customNamespacePropertiesBuilder = undefined
 } = {}) => {
   return (req, res, next) => {
     ns.bindEmitter(req)
@@ -31,6 +38,7 @@ const expressMiddleware = ({
 
     ns.run(() => {
       ns.set('requestId', requestId)
+      setupCustomNamespaceProperties(customNamespacePropertiesBuilder, req)
       next()
     })
   }
@@ -46,7 +54,8 @@ const expressMiddleware = ({
  */
 const koaMiddleware = ({
   useHeader = false,
-  headerName = 'X-Request-Id'
+  headerName = 'X-Request-Id',
+  customNamespacePropertiesBuilder = undefined
 } = {}) => {
   return (ctx, next) => {
     ns.bindEmitter(ctx.req)
@@ -60,6 +69,7 @@ const koaMiddleware = ({
 
     return new Promise(ns.bind((resolve, reject) => {
       ns.set('requestId', requestId)
+      setupCustomNamespaceProperties(customNamespacePropertiesBuilder, ctx.req)
       return next().then(resolve).catch(reject)
     }))
   }
@@ -75,7 +85,8 @@ const koaMiddleware = ({
  */
 const koaV1Middleware = ({
   useHeader = false,
-  headerName = 'X-Request-Id'
+  headerName = 'X-Request-Id',
+  customNamespacePropertiesBuilder = undefined
 } = {}) => {
   return function * (next) {
     ns.bindEmitter(this.req)
@@ -90,6 +101,7 @@ const koaV1Middleware = ({
       }
       requestId = requestId || uuidv1()
       ns.set('requestId', requestId)
+      setupCustomNamespaceProperties(customNamespacePropertiesBuilder, this.request)
 
       yield next
     } finally {
@@ -110,7 +122,8 @@ const hapiPlugin = ({
   register: async (server, options) => {
     const {
       useHeader = false,
-      headerName = 'X-Request-Id'
+      headerName = 'X-Request-Id',
+      customNamespacePropertiesBuilder = undefined
     } = options
 
     server.ext('onRequest', (request, h) => {
@@ -130,6 +143,7 @@ const hapiPlugin = ({
       }
       requestId = requestId || uuidv1()
       ns.set('requestId', requestId)
+      setupCustomNamespaceProperties(customNamespacePropertiesBuilder, request)
 
       return h.continue
     })
@@ -146,11 +160,17 @@ const hapiPlugin = ({
  */
 const id = () => ns.get('requestId')
 
+/**
+ * Returns property's value or `undefined` in case if the call is made from an outside CLS context.
+ */
+const getNamespaceProperty = (propertyName) => ns.get(propertyName)
+
 module.exports = {
   expressMiddleware,
   fastifyMiddleware: expressMiddleware,
   koaMiddleware,
   koaV1Middleware,
   hapiPlugin,
-  id
+  id,
+  getNamespaceProperty
 }

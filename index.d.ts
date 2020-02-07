@@ -5,6 +5,8 @@ export interface IOptions {
   useHeader?: boolean
   // Default: 'X-Request-Id'
   headerName?: string
+  // Default: undefined
+  customNamespacePropertiesBuilder?: (request: any, namespace: any) => void
 }
 
 export interface IHapiPlugin<T> {

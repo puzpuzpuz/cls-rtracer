@@ -17,6 +17,12 @@ const setupServer = async ({
     handler
   })
 
+  server.route({
+    method: 'GET',
+    path: '/test',
+    handler
+  })
+
   await server.register({
     plugin: rTracer.hapiPlugin,
     options
@@ -242,5 +248,32 @@ describe('cls-rtracer for Hapi', () => {
     expect(res1.result.id).toEqual(ids['id1'])
     expect(res2.result.id).toEqual(ids['id2'])
     expect(res1.result.id).not.toEqual(res2.result.id)
+  })
+
+  test('generates custom namespace property for request', async () => {
+    const propertyName = 'originalUrl'
+    let propertyValue
+    server = await setupServer({
+      options: {
+        customNamespacePropertiesBuilder: (request, namespace) => {
+          namespace.set(propertyName, request.path)
+        }
+      },
+      handler: () => {
+        propertyValue = rTracer.getNamespaceProperty(propertyName)
+        return { propertyValue }
+      }
+    })
+
+    const requestUrl = '/test'
+    const res = await server.inject({
+      method: 'get',
+      url: requestUrl
+    })
+
+    expect(res.statusCode).toBe(200)
+    expect(propertyValue).toEqual(requestUrl)
+    expect(res.result.propertyValue).toEqual(requestUrl)
+    expect(res.result.propertyValue.length).toBeGreaterThan(0)
   })
 })

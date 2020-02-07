@@ -253,4 +253,31 @@ describe('cls-rtracer for Fastify', () => {
       expect(id1).not.toEqual(id2)
     })
   })
+
+  test('generates custom namespace property for request', () => {
+    const app = Fastify()
+    const propertyName = 'originalUrl'
+
+    app.use(rTracer.expressMiddleware({
+      customNamespacePropertiesBuilder: (request, namespace) => {
+        namespace.set(propertyName, request.originalUrl)
+      }
+    }))
+
+    let propertyValue
+
+    const requestUrl = '/test'
+    app.get(requestUrl, async (_, reply) => {
+      propertyValue = rTracer.getNamespaceProperty(propertyName)
+      reply.send({ propertyValue })
+    })
+
+    return app.ready().then(() => request(app.server).get('/test'))
+      .then(res => {
+        expect(res.statusCode).toBe(200)
+        expect(propertyValue).toEqual(requestUrl)
+        expect(res.body.propertyValue).toEqual(requestUrl)
+        expect(res.body.propertyValue.length).toBeGreaterThan(0)
+      })
+  })
 })

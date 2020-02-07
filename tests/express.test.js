@@ -257,4 +257,31 @@ describe('cls-rtracer for Express', () => {
       expect(id1).not.toEqual(id2)
     })
   })
+
+  test('generates custom namespace property for request', () => {
+    const app = express()
+    const propertyName = 'originalUrl'
+
+    app.use(rTracer.expressMiddleware({
+      customNamespacePropertiesBuilder: (request, namespace) => {
+        namespace.set(propertyName, request.originalUrl)
+      }
+    }))
+
+    let propertyValue
+
+    const requestUrl = '/test'
+    app.get(requestUrl, (req, res) => {
+      propertyValue = rTracer.getNamespaceProperty(propertyName)
+      res.json({ propertyValue })
+    })
+
+    return request(app).get(requestUrl)
+      .then(res => {
+        expect(res.statusCode).toBe(200)
+        expect(propertyValue).toEqual(requestUrl)
+        expect(res.body.propertyValue).toEqual(requestUrl)
+        expect(res.body.propertyValue.length).toBeGreaterThan(0)
+      })
+  })
 })
