@@ -19,7 +19,7 @@
   "homepage": "https://github.com/puzpuzpuz/cls-rtracer",
   "main": "index.js",
   "engines": {
-    "node": ">=8.0.0 - <10.0.0 || >=10.4.0"
+    "node": ">=8.0.0 <10.0.0 || >=10.4.0"
   },
   "files": [
     "index.js",
