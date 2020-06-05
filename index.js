@@ -1,11 +1,9 @@
 'use strict'
 
-const cls = require('cls-hooked')
+const { AsyncLocalStorage } = require('async_hooks')
 const uuidv1 = require('uuid/v1')
 
-// generate a unique value for namespace
-const nsid = `rtracer:${uuidv1()}`
-const ns = cls.createNamespace(nsid)
+const als = new AsyncLocalStorage()
 
 /**
  * Generates a request tracer middleware for Express.
@@ -20,8 +18,9 @@ const expressMiddleware = ({
   headerName = 'X-Request-Id'
 } = {}) => {
   return (req, res, next) => {
-    ns.bindEmitter(req)
-    ns.bindEmitter(res)
+    // TODO
+    // ns.bindEmitter(req)
+    // ns.bindEmitter(res)
 
     let requestId
     if (useHeader) {
@@ -29,10 +28,7 @@ const expressMiddleware = ({
     }
     requestId = requestId || uuidv1()
 
-    ns.run(() => {
-      ns.set('requestId', requestId)
-      next()
-    })
+    als.run(requestId, next)
   }
 }
 
@@ -49,8 +45,9 @@ const koaMiddleware = ({
   headerName = 'X-Request-Id'
 } = {}) => {
   return (ctx, next) => {
-    ns.bindEmitter(ctx.req)
-    ns.bindEmitter(ctx.res)
+    // TODO
+    // ns.bindEmitter(ctx.req)
+    // ns.bindEmitter(ctx.res)
 
     let requestId
     if (useHeader) {
@@ -58,10 +55,7 @@ const koaMiddleware = ({
     }
     requestId = requestId || uuidv1()
 
-    return new Promise(ns.bind((resolve, reject) => {
-      ns.set('requestId', requestId)
-      return next().then(resolve).catch(reject)
-    }))
+    return als.run(requestId, next)
   }
 }
 
@@ -78,22 +72,21 @@ const koaV1Middleware = ({
   headerName = 'X-Request-Id'
 } = {}) => {
   return function * (next) {
-    ns.bindEmitter(this.req)
-    ns.bindEmitter(this.res)
+    // TODO
+    // ns.bindEmitter(this.req)
+    // ns.bindEmitter(this.res)
 
-    const clsCtx = ns.createContext()
-    ns.enter(clsCtx)
+    let requestId
+    if (useHeader) {
+      requestId = this.request.headers[headerName.toLowerCase()]
+    }
+    requestId = requestId || uuidv1()
+
+    als.enterWith(requestId)
     try {
-      let requestId
-      if (useHeader) {
-        requestId = this.request.headers[headerName.toLowerCase()]
-      }
-      requestId = requestId || uuidv1()
-      ns.set('requestId', requestId)
-
       yield next
     } finally {
-      ns.exit(clsCtx)
+      als.enterWith(undefined)
     }
   }
 }
@@ -114,37 +107,31 @@ const hapiPlugin = ({
     } = options
 
     server.ext('onRequest', (request, h) => {
-      ns.bindEmitter(request.raw.req)
-      ns.bindEmitter(request.raw.res)
-
-      const clsCtx = ns.createContext()
-      ns.enter(clsCtx)
-
-      request.plugins[pluginName] = {
-        context: clsCtx
-      }
+      // TODO
+      // ns.bindEmitter(request.raw.req)
+      // ns.bindEmitter(request.raw.res)
 
       let requestId
       if (useHeader) {
         requestId = request.headers[headerName.toLowerCase()]
       }
       requestId = requestId || uuidv1()
-      ns.set('requestId', requestId)
+      als.enterWith(requestId)
 
       return h.continue
     })
 
     server.events.on('response', request => {
-      const clsCtx = request.plugins[pluginName].context
-      ns.exit(clsCtx)
+      als.enterWith(undefined)
     })
   }
 })
 
 /**
- * Returns request tracer id or `undefined` in case if the call is made from an outside CLS context.
+ * Returns request tracer id or `undefined` in case if the call is made from
+ * an outside CLS context.
  */
-const id = () => ns.get('requestId')
+const id = () => als.getStore()
 
 module.exports = {
   expressMiddleware,
