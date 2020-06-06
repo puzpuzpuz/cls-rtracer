@@ -27,7 +27,7 @@ Note for TypeScript users: typings are included.
 
 ## How to use it - Step 2 (Common instructions)
 
-Use the middleware (or plugin) provided by the library before the first middleware that needs to have access to request ids. Note that some middlewares, may cause the context (i.e. Async Hooks execution path) to get lost. To avoid such issues, you should use any third party middleware that does not need access to request ids *before* you use this middleware. See issue #20 as an example.
+Use the middleware (or plugin) provided by the library before the first middleware that needs to have access to request ids. Note that some middlewares, may cause CLS context (i.e. Async Hooks execution path) to get lost. To avoid such issues, you should use any third party middleware that does not need access to request ids *before* you use this middleware. See issue #20 as an example.
 
 ## How to use it - Step 2 (Express users)
 
