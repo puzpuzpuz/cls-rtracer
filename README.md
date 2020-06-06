@@ -13,7 +13,7 @@ Tested and works fine with Express v4, Fastify v2, Koa (both v1 and v2), and Hap
 
 ## Supported Node.js versions
 
-As `cls-rtracer` v2 depends on [`AsyncLocalStorage API`](https://nodejs.org/api/async_hooks.html#async_hooks_class_asynclocalstorage), it requires Node.js 12.17.0+, 13.11.0+, or 14.0.0+. If you happen to use an older Node.js version, you should use `cls-rtracer` v1 which is based on [`cls-hooked`](https://github.com/jeff-lewis/cls-hooked).
+As `cls-rtracer` v2 depends on [`AsyncLocalStorage API`](https://nodejs.org/api/async_hooks.html#async_hooks_class_asynclocalstorage), it requires Node.js 12.17.0+, 13.13.0+, or 14.0.0+. If you happen to use an older Node.js version, you should use `cls-rtracer` v1 which is based on [`cls-hooked`](https://github.com/jeff-lewis/cls-hooked).
 
 ## How to use it - Step 1
 
