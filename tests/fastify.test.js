@@ -12,7 +12,7 @@ describe('cls-rtracer for Fastify', () => {
     expect(id).toBeUndefined()
   })
 
-  test('generates id for request', () => {
+  test('generates id for request - available in handler', () => {
     const app = Fastify()
     app.use(rTracer.fastifyMiddleware())
 
@@ -29,6 +29,26 @@ describe('cls-rtracer for Fastify', () => {
         expect(res.body.id).toEqual(id)
         expect(res.body.id.length).toBeGreaterThan(0)
       })
+  })
+
+  test('generates id for request - available in emitters', (done) => {
+    const app = Fastify()
+    app.use(rTracer.fastifyMiddleware())
+
+    app.get('/test', async (request, reply) => {
+      const id = rTracer.id()
+      request.raw.on('close', () => {
+        try {
+          expect(rTracer.id()).toEqual(id)
+          done()
+        } catch (error) {
+          done(error)
+        }
+      })
+      return 'hello world'
+    })
+
+    app.ready().then(() => request(app.server).get('/test')).catch(done)
   })
 
   test('ignores header by default', () => {

@@ -2,7 +2,7 @@
 
 const wrapEmitter = (emitter, asyncResource) => {
   const original = emitter.emit
-  emitter.emit = (type, ...args) => {
+  emitter.emit = function (type, ...args) {
     return asyncResource.runInAsyncScope(original, emitter, type, ...args)
   }
 }
