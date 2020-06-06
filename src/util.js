@@ -1,9 +1,9 @@
 'use strict'
 
 const wrapEmitter = (emitter, asyncResource) => {
-  const original = emitter.emit;
+  const original = emitter.emit
   emitter.emit = (type, ...args) => {
-    return asyncResource.runInAsyncScope(original, emitter, type, ...args);
+    return asyncResource.runInAsyncScope(original, emitter, type, ...args)
   }
 }
 

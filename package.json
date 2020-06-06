@@ -46,17 +46,17 @@
     "logging"
   ],
   "dependencies": {
-    "uuid": "3.3.3"
+    "uuid": "8.1.0"
   },
   "devDependencies": {
-    "@hapi/hapi": "^18.4.0",
-    "coveralls": "^3.0.3",
-    "express": "^4.16.4",
-    "fastify": "^2.6.0",
-    "jest": "^24.7.1",
-    "koa": "^2.7.0",
-    "koav1": "npm:koa@^1.6.2",
-    "standard": "^12.0.1",
+    "@hapi/hapi": "^19.1.1",
+    "coveralls": "^3.1.0",
+    "express": "^4.17.1",
+    "fastify": "^2.14.1",
+    "jest": "^26.0.1",
+    "koa": "^2.12.0",
+    "koav1": "npm:koa@^1.7.0",
+    "standard": "^14.3.4",
     "supertest": "^3.4.2",
     "winston": "^3.2.1"
   }

@@ -181,9 +181,9 @@ describe('cls-rtracer for Koa', () => {
           expect(res.body.id.length).toBeGreaterThan(0)
           return res.body.id
         })
-    ]).then(([ id1, id2 ]) => {
-      expect(id1).toEqual(ids['id1'])
-      expect(id2).toEqual(ids['id2'])
+    ]).then(([id1, id2]) => {
+      expect(id1).toEqual(ids.id1)
+      expect(id2).toEqual(ids.id2)
       expect(id1).not.toEqual(id2)
     })
   })
@@ -216,9 +216,9 @@ describe('cls-rtracer for Koa', () => {
           expect(res.body.id.length).toBeGreaterThan(0)
           return res.body.id
         })
-    ]).then(([ id1, id2 ]) => {
-      expect(id1).toEqual(ids['id1'])
-      expect(id2).toEqual(ids['id2'])
+    ]).then(([id1, id2]) => {
+      expect(id1).toEqual(ids.id1)
+      expect(id2).toEqual(ids.id2)
       expect(id1).not.toEqual(id2)
     })
   })

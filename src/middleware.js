@@ -1,7 +1,7 @@
 'use strict'
 
 const { wrapEmitter } = require('./util')
-const uuidv1 = require('uuid/v1')
+const { v1: uuidv1 } = require('uuid')
 const { AsyncLocalStorage, AsyncResource } = require('async_hooks')
 
 const als = new AsyncLocalStorage()
