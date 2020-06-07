@@ -2,6 +2,7 @@
 'use strict'
 
 const Hapi = require('@hapi/hapi')
+const request = require('supertest')
 
 const rTracer = require('../index')
 
@@ -41,7 +42,7 @@ describe('cls-rtracer for Hapi', () => {
     expect(id).toBeUndefined()
   })
 
-  test('generates id for request', async () => {
+  test('generates id for request - available in handler', async () => {
     let id
     server = await setupServer({
       handler: () => {
@@ -58,6 +59,27 @@ describe('cls-rtracer for Hapi', () => {
     expect(res.statusCode).toBe(200)
     expect(res.result.id).toEqual(id)
     expect(res.result.id.length).toBeGreaterThan(0)
+  })
+
+  test('generates id for request - available in emitters', (done) => {
+    let id
+    setupServer({
+      handler: (request) => {
+        id = rTracer.id()
+        request.raw.req.on('close', () => {
+          try {
+            expect(rTracer.id()).toEqual(id)
+            done()
+          } catch (error) {
+            done(error)
+          }
+        })
+        return 'hello world'
+      }
+    }).then((server) => {
+      // have to use supertest here to get events emitted
+      return request(server.listener).get('/')
+    }).catch(done)
   })
 
   test('ignores header by default', async () => {
@@ -239,8 +261,8 @@ describe('cls-rtracer for Hapi', () => {
     expect(res1.result.id.length).toBeGreaterThan(0)
     expect(res2.statusCode).toBe(200)
     expect(res2.result.id.length).toBeGreaterThan(0)
-    expect(res1.result.id).toEqual(ids['id1'])
-    expect(res2.result.id).toEqual(ids['id2'])
+    expect(res1.result.id).toEqual(ids.id1)
+    expect(res2.result.id).toEqual(ids.id2)
     expect(res1.result.id).not.toEqual(res2.result.id)
   })
 })

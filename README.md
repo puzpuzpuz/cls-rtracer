@@ -5,27 +5,29 @@
 
 # cls-rtracer
 
-Request Tracer - Express, Fastify and Koa middlewares, and Hapi plugin for CLS-based request id generation, batteries included. An out-of-the-box solution for adding request ids into your logs. Check out [this Medium post](https://medium.com/@apechkurov/request-id-tracing-in-node-js-applications-c517c7dab62d) that describes the rationale behind `cls-rtracer`.
+Request Tracer - Express, Fastify and Koa middlewares, and Hapi plugin for CLS-based request id generation, batteries included. An out-of-the-box solution for adding request ids into your logs. Check out [this blog post](https://medium.com/@apechkurov/request-id-tracing-in-node-js-applications-c517c7dab62d) that describes the rationale behind `cls-rtracer`.
 
-Automatically generates a UUID V1 value as the id for each request and stores it in Continuation-Local Storage (CLS, see [cls-hooked](https://github.com/jeff-lewis/cls-hooked)). Optionally, if the request contains `X-Request-Id` header, uses its value instead. Allows to obtain the generated request id anywhere in your routes later and use it for logging or any other purposes.
+Automatically generates a UUID V1 value as the id for each request and stores it in `AsyncLocalStorage` (CLS core API, see [this blog post](https://itnext.io/one-node-js-cls-api-to-rule-them-all-1670ac66a9e8)). Optionally, if the request contains `X-Request-Id` header, uses its value instead. Allows to obtain the generated request id anywhere in your routes later and use it for logging or any other purposes.
 
 Tested and works fine with Express v4, Fastify v2, Koa (both v1 and v2), and Hapi v18.
+
+## Supported Node.js versions
+
+As `cls-rtracer` v2 depends on [`AsyncLocalStorage API`](https://nodejs.org/api/async_hooks.html#async_hooks_class_asynclocalstorage), it requires Node.js 12.17.0+, 13.14.0+, or 14.0.0+. If you happen to use an older Node.js version, you should use [`cls-rtracer` v1](https://github.com/puzpuzpuz/cls-rtracer/tree/1.x) which is based on [`cls-hooked`](https://github.com/jeff-lewis/cls-hooked).
 
 ## How to use it - Step 1
 
 Install:
 
 ```bash
-npm install --save cls-rtracer cls-hooked
+npm install --save cls-rtracer
 ```
-
-Note: `cls-hooked` has to be installed explicitly, as it's a [peer dependency](https://nodejs.org/es/blog/npm/peer-dependencies/) for this library. See [this issue](https://github.com/puzpuzpuz/cls-rtracer/issues/18) for more details.
 
 Note for TypeScript users: typings are included.
 
 ## How to use it - Step 2 (Common instructions)
 
-Use the middleware (or plugin) provided by the library before the first middleware that needs to have access to request ids. Note that some middlewares, e.g. express-session, body-parser, or express-jwt, may cause CLS context (i.e. Async Hooks execution path) to get lost. To avoid such issues, you should use any third party middleware that does not need access to request ids *before* you use this middleware. See issue #20 as an example.
+Use the middleware (or plugin) provided by the library before the first middleware that needs to have access to request ids. Note that some middlewares, may cause CLS context (i.e. Async Hooks execution path) to get lost. To avoid such issues, you should use any third party middleware that does not need access to request ids *before* you use this middleware. See issue #20 as an example.
 
 ## How to use it - Step 2 (Express users)
 
@@ -290,21 +292,15 @@ These are the available config options for the middleware functions. All config 
 
 To avoid weird behavior:
 
-* Make sure you require `cls-rtracer` as the first dependency in your app. Some popular packages may use async which breaks CLS.
-
 * Make sure you use any third party middleware (or plugin) that does not need access to request ids *before* you use `cls-rtracer`. See [this section](#how-to-use-it---step-2-common-instructions).
 
-Note: there is a small chance that you are using one of rare libraries that do not play nice with Async Hooks API, which is internally used by the `cls-hooked` library. So, if you face the issue when CLS context (and thus, the request id) is lost at some point of async calls chain, please submit GitHub issue with a detailed description.
-
-Note for Node 10 users:
-
-* Node 10.0.x-10.3.x is not supported. That's because V8 version 6.6 introduced a bug that breaks async_hooks during async/await. Node 10.4.x uses V8 v6.7 where the bug is fixed. See: https://github.com/nodejs/node/issues/20274.
+Note: there is a small chance that you are using one of rare libraries that do not play nice with Async Hooks API. So, if you face the issue when the context (and thus, the request id) is lost at some point of async calls chain, please submit GitHub issue with a detailed description.
 
 ## Performance impact
 
-Note that this library has a certain performance impact on your application due to CLS (or more precisely, Async Hooks API) usage. So, you need to decide if the benefit of being able to trace requests in logs without any boilerplate is more valuable for you than the disadvantage of performance impact.
+Note that this library has a certain performance impact on your application due to Async Hooks API usage. So, you need to decide if the benefit of being able to trace requests in logs without any boilerplate is more valuable for you than the disadvantage of performance impact.
 
-The author of this library did some basic performance testing and got about 10–15% RPS (request per second) degradation when `cls-rtracer` is used. See [this post](https://stackoverflow.com/questions/50595130/express-what-load-can-continuation-local-storage-handle/53647537#53647537) for more details.
+The author of this library did some basic performance testing. See [this tweet](https://twitter.com/AndreyPechkurov/status/1234189388436967426) to see the results. The overhead also decreased in `cls-rtracer` v2 due to migration to the core API. See [this tweet](https://twitter.com/AndreyPechkurov/status/1268950294165143553?s=20) to learn more.
 
 ## License
 

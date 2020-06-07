@@ -12,7 +12,7 @@ describe('cls-rtracer for Koa v1', () => {
     expect(id).toBeUndefined()
   })
 
-  test('generates id for request', () => {
+  test('generates id for request - available in handler', () => {
     const app = new Koa()
     app.use(rTracer.koaV1Middleware())
 
@@ -29,6 +29,26 @@ describe('cls-rtracer for Koa v1', () => {
         expect(res.body.id).toEqual(id)
         expect(res.body.id.length).toBeGreaterThan(0)
       })
+  })
+
+  test('generates id for request - available in emitters', (done) => {
+    const app = new Koa()
+    app.use(rTracer.koaV1Middleware())
+
+    app.use(function * () {
+      const id = rTracer.id()
+      this.req.on('close', () => {
+        try {
+          expect(rTracer.id()).toEqual(id)
+          done()
+        } catch (error) {
+          done(error)
+        }
+      })
+      this.body = { id }
+    })
+
+    request(app.callback()).get('/').catch(done)
   })
 
   test('ignores header by default', () => {
@@ -179,9 +199,9 @@ describe('cls-rtracer for Koa v1', () => {
           expect(res.body.id.length).toBeGreaterThan(0)
           return res.body.id
         })
-    ]).then(([ id1, id2 ]) => {
-      expect(id1).toEqual(ids['id1'])
-      expect(id2).toEqual(ids['id2'])
+    ]).then(([id1, id2]) => {
+      expect(id1).toEqual(ids.id1)
+      expect(id2).toEqual(ids.id2)
       expect(id1).not.toEqual(id2)
     })
   })

@@ -12,7 +12,7 @@ describe('cls-rtracer for Express', () => {
     expect(id).toBeUndefined()
   })
 
-  test('generates id for request', () => {
+  test('generates id for request - available in handler', () => {
     const app = express()
     app.use(rTracer.expressMiddleware())
 
@@ -29,6 +29,26 @@ describe('cls-rtracer for Express', () => {
         expect(res.body.id).toEqual(id)
         expect(res.body.id.length).toBeGreaterThan(0)
       })
+  })
+
+  test('generates id for request - available in emitters', (done) => {
+    const app = express()
+    app.use(rTracer.expressMiddleware())
+
+    app.get('/test', (req, res) => {
+      const id = rTracer.id()
+      req.on('end', () => {
+        try {
+          expect(rTracer.id()).toEqual(id)
+          done()
+        } catch (error) {
+          done(error)
+        }
+      })
+      res.end()
+    })
+
+    request(app).get('/test').catch(done)
   })
 
   test('ignores header by default', () => {
@@ -179,9 +199,9 @@ describe('cls-rtracer for Express', () => {
           expect(res.body.id.length).toBeGreaterThan(0)
           return res.body.id
         })
-    ]).then(([ id1, id2 ]) => {
-      expect(id1).toEqual(ids['id1'])
-      expect(id2).toEqual(ids['id2'])
+    ]).then(([id1, id2]) => {
+      expect(id1).toEqual(ids.id1)
+      expect(id2).toEqual(ids.id2)
       expect(id1).not.toEqual(id2)
     })
   })
@@ -216,9 +236,9 @@ describe('cls-rtracer for Express', () => {
           expect(res.body.id.length).toBeGreaterThan(0)
           return res.body.id
         })
-    ]).then(([ id1, id2 ]) => {
-      expect(id1).toEqual(ids['id1'])
-      expect(id2).toEqual(ids['id2'])
+    ]).then(([id1, id2]) => {
+      expect(id1).toEqual(ids.id1)
+      expect(id2).toEqual(ids.id2)
       expect(id1).not.toEqual(id2)
     })
   })
@@ -251,9 +271,9 @@ describe('cls-rtracer for Express', () => {
           expect(res.body.id.length).toBeGreaterThan(0)
           return res.body.id
         })
-    ]).then(([ id1, id2 ]) => {
-      expect(id1).toEqual(ids['id1'])
-      expect(id2).toEqual(ids['id2'])
+    ]).then(([id1, id2]) => {
+      expect(id1).toEqual(ids.id1)
+      expect(id2).toEqual(ids.id2)
       expect(id1).not.toEqual(id2)
     })
   })
