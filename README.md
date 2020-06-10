@@ -5,7 +5,7 @@
 
 # cls-rtracer
 
-Request Tracer - Express, Fastify and Koa middlewares, and Hapi plugin for CLS-based request id generation, batteries included. An out-of-the-box solution for adding request ids into your logs. Check out [this blog post](https://medium.com/@apechkurov/request-id-tracing-in-node-js-applications-c517c7dab62d) that describes the rationale behind `cls-rtracer`.
+Request Tracer - Express & Koa middlewares, and Fastify & Hapi plugins for CLS-based request id generation, batteries included. An out-of-the-box solution for adding request ids into your logs. Check out [this blog post](https://medium.com/@apechkurov/request-id-tracing-in-node-js-applications-c517c7dab62d) that describes the rationale behind `cls-rtracer`.
 
 Automatically generates a UUID V1 value as the id for each request and stores it in `AsyncLocalStorage` (CLS core API, see [this blog post](https://itnext.io/one-node-js-cls-api-to-rule-them-all-1670ac66a9e8)). Optionally, if the request contains `X-Request-Id` header, uses its value instead. Allows to obtain the generated request id anywhere in your routes later and use it for logging or any other purposes.
 

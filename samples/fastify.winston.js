@@ -28,7 +28,7 @@ const logger = createLogger({
 const Fastify = require('fastify')
 const app = new Fastify()
 
-app.use(rTracer.fastifyMiddleware())
+app.register(rTracer.fastifyPlugin())
 
 app.get('/', async (request, reply) => {
   logger.info('Starting request handling')
