@@ -176,10 +176,32 @@ for (const type of types) {
         })
 
         return app.ready()
-          .then(() => request(app.server).get('/test').set('X-Request-Id', ''))
+          .then(() => request(app.server).get('/test'))
           .then(res => {
             expect(res.statusCode).toBe(200)
             expect(res.body.id).toEqual(1)
+          })
+      })
+
+      test('uses header instead of fastify id in case of override', () => {
+        const app = Fastify()
+        register(type, app, {
+          useHeader: true,
+          useFastifyRequestId: true
+        })
+
+        const idInHead = 'id-from-header'
+
+        app.get('/test', async (_, reply) => {
+          const id = rTracer.id()
+          reply.send({ id })
+        })
+
+        return app.ready()
+          .then(() => request(app.server).get('/test').set('X-Request-Id', idInHead))
+          .then(res => {
+            expect(res.statusCode).toBe(200)
+            expect(res.body.id).toEqual(idInHead)
           })
       })
     }

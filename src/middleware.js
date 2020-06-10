@@ -60,7 +60,7 @@ const fastifyPlugin = ({
         requestId = request.headers[headerName.toLowerCase()]
       }
       if (useFastifyRequestId) {
-        requestId = request.id
+        requestId = requestId || request.id
       }
       requestId = requestId || uuidv1()
 
