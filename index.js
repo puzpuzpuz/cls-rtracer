@@ -2,6 +2,7 @@
 
 const {
   expressMiddleware,
+  fastifyPlugin,
   fastifyMiddleware,
   koaMiddleware,
   koaV1Middleware,
@@ -11,6 +12,7 @@ const {
 
 module.exports = {
   expressMiddleware,
+  fastifyPlugin,
   fastifyMiddleware,
   koaMiddleware,
   koaV1Middleware,

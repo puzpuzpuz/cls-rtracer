@@ -4,6 +4,8 @@ const { wrapEmitter } = require('./util')
 const { v1: uuidv1 } = require('uuid')
 const { AsyncLocalStorage, AsyncResource } = require('async_hooks')
 
+const pluginName = 'cls-rtracer'
+
 const als = new AsyncLocalStorage()
 
 const wrapHttpEmitters = (req, res) => {
@@ -36,6 +38,42 @@ const expressMiddleware = ({
       next()
     })
   }
+}
+
+/**
+ * Generates a request tracer plugin for Fastify.
+ * @param {Object} options possible options
+ * @param {boolean} options.useHeader respect request header flag
+ *                                    (default: `false`)
+ * @param {string} options.headerName request header name, used if `useHeader` is set to `true`
+ *                                    (default: `X-Request-Id`)
+ */
+const fastifyPlugin = ({
+  useHeader = false,
+  headerName = 'X-Request-Id',
+  useFastifyRequestId = false
+} = {}) => {
+  const plugin = (fastify, options, next) => {
+    fastify.addHook('onRequest', (request, reply, done) => {
+      let requestId
+      if (useHeader) {
+        requestId = request.headers[headerName.toLowerCase()]
+      }
+      if (useFastifyRequestId) {
+        requestId = request.id
+      }
+      requestId = requestId || uuidv1()
+
+      als.run(requestId, () => {
+        wrapHttpEmitters(request.raw, reply.res)
+        done()
+      })
+    })
+    next()
+  }
+  plugin[Symbol.for('skip-override')] = true
+  plugin[Symbol.for('fastify.display-name')] = pluginName
+  return plugin
 }
 
 /**
@@ -93,8 +131,6 @@ const koaV1Middleware = ({
   }
 }
 
-const pluginName = 'cls-rtracer'
-
 /**
  * A request tracer plugin for Hapi
  * @type {{once: boolean, name: string, register: hapiPlugin.register}}
@@ -134,6 +170,7 @@ const id = () => als.getStore()
 
 module.exports = {
   expressMiddleware,
+  fastifyPlugin,
   fastifyMiddleware: expressMiddleware,
   koaMiddleware,
   koaV1Middleware,
