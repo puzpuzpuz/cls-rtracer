@@ -7,6 +7,15 @@ export interface IOptions {
   headerName?: string
 }
 
+export interface IFastifyOptions {
+  // Default: false
+  useHeader?: boolean
+  // Default: 'X-Request-Id'
+  headerName?: string
+  // Default: false
+  useFastifyRequestId?: boolean
+}
+
 export interface IHapiPlugin<T> {
   name: string
   once: boolean
@@ -21,6 +30,14 @@ export declare const expressMiddleware: (
   req: IncomingMessage,
   res: ServerResponse,
   next: (err?: any) => void,
+) => void
+
+export declare const fastifyPlugin: (
+  options?: IFastifyOptions,
+) => (
+  fastify: any,
+  options: any,
+  done: (err?: any) => void,
 ) => void
 
 export declare const fastifyMiddleware: (

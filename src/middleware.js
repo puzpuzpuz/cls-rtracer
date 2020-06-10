@@ -42,18 +42,21 @@ const expressMiddleware = ({
 
 /**
  * Generates a request tracer plugin for Fastify.
+ *
  * @param {Object} options possible options
  * @param {boolean} options.useHeader respect request header flag
  *                                    (default: `false`)
  * @param {string} options.headerName request header name, used if `useHeader` is set to `true`
  *                                    (default: `X-Request-Id`)
+ * @param {boolean} options.useFastifyRequestId respect Fastify request id flag
+ *                                    (default: `false`)
  */
 const fastifyPlugin = ({
   useHeader = false,
   headerName = 'X-Request-Id',
   useFastifyRequestId = false
 } = {}) => {
-  const plugin = (fastify, options, next) => {
+  const plugin = (fastify, _, next) => {
     fastify.addHook('onRequest', (request, reply, done) => {
       let requestId
       if (useHeader) {
