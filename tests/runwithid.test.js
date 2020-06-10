@@ -26,7 +26,8 @@ describe('runWithId', () => {
 
   test('supports awaiting the function', (done) => {
     async function asyncFn () {
-      await runWithId(() => {
+      await runWithId(async () => {
+        await new Promise((resolve) => setTimeout(resolve, 0))
         expect(id()).toEqual(42)
       }, 42)
     }
