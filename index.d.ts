@@ -22,8 +22,6 @@ export interface IHapiPlugin<T> {
   register: (server: any, options: T) => void | Promise<void>
 }
 
-export declare const id: () => string | undefined
-
 export declare const expressMiddleware: (
   options?: IOptions,
 ) => (
@@ -60,3 +58,7 @@ export declare const koaV1Middleware: (
 ) => GeneratorFunction
 
 export declare const hapiPlugin: IHapiPlugin<IOptions>
+
+export declare const runWithId: (fn: Function, id?: any) => any
+
+export declare const id: () => string | undefined

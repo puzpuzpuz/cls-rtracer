@@ -301,6 +301,30 @@ These are the available config options for the middleware/plugin functions. All 
 }
 ```
 
+## Advanced features
+
+In certain situations you may want to have an id available outside of the request handler scope, say, in a code that acts as a background job. In this case you may use the `runWithId()` function:
+
+```js
+const rTracer = require('cls-rtracer')
+
+rTracer.runWithId(() => {
+  console.log(rTracer.id()) // id is available here
+  setInterval(() => {
+    console.log(rTracer.id()) // and here
+  }, 1000)
+})
+
+// you may override id by providing the 2nd argument
+rTracer.runWithId(() => {
+  // ...
+}, 42) // 42 is the id override here
+
+// async/await syntax is also supported, as `runWithId()`
+// returns the result of `fn`
+await rTracer.runWithId(myAsyncFn)
+```
+
 ## Troubleshooting
 
 To avoid weird behavior:

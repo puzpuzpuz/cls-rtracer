@@ -16,6 +16,7 @@ const wrapHttpEmitters = (req, res) => {
 
 /**
  * Generates a request tracer middleware for Express.
+ *
  * @param {Object} options possible options
  * @param {boolean} options.useHeader respect request header flag
  *                                    (default: `false`)
@@ -81,6 +82,7 @@ const fastifyPlugin = ({
 
 /**
  * Generates a request tracer middleware for Koa v2.
+ *
  * @param {Object} options possible options
  * @param {boolean} options.useHeader respect request header flag
  *                                    (default: `false`)
@@ -107,6 +109,7 @@ const koaMiddleware = ({
 
 /**
  * Generates a request tracer middleware for Koa v1.
+ *
  * @param {Object} options possible options
  * @param {boolean} options.useHeader respect request header flag
  *                                    (default: `false`)
@@ -135,7 +138,8 @@ const koaV1Middleware = ({
 }
 
 /**
- * A request tracer plugin for Hapi
+ * A request tracer plugin for Hapi.
+ *
  * @type {{once: boolean, name: string, register: hapiPlugin.register}}
  */
 const hapiPlugin = ({
@@ -166,6 +170,17 @@ const hapiPlugin = ({
 })
 
 /**
+ * Runs the given function in scope of the id.
+ *
+ * @param {Function} fn function to run
+ * @param {*} id optional id to be available in the function
+ */
+const runWithId = (fn, id) => {
+  id = id || uuidv1()
+  return als.run(id, fn)
+}
+
+/**
  * Returns request tracer id or `undefined` in case if the call is made from
  * an outside CLS context.
  */
@@ -178,5 +193,6 @@ module.exports = {
   koaMiddleware,
   koaV1Middleware,
   hapiPlugin,
+  runWithId,
   id
 }
