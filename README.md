@@ -290,7 +290,7 @@ These are the available config options for the middleware functions. All config 
 
 ## Advanced features
 
-In certain situations you may want to have an id available in the scope of an arbitrary function, e.g. in a code that acts as a background job. In this case you may use the `runWithId()` function:
+In certain situations you may want to have an id available outside of the request handler scope, say, in a code that acts as a background job. In this case you may use the `runWithId()` function:
 
 ```js
 const rTracer = require('cls-rtracer')
