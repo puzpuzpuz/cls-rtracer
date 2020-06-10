@@ -6,6 +6,7 @@ const {
   koaMiddleware,
   koaV1Middleware,
   hapiPlugin,
+  runWithId,
   id
 } = require('./src/middleware')
 
@@ -15,5 +16,6 @@ module.exports = {
   koaMiddleware,
   koaV1Middleware,
   hapiPlugin,
+  runWithId,
   id
 }
