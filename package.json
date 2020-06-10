@@ -1,7 +1,7 @@
 {
   "name": "cls-rtracer",
-  "version": "2.0.0",
-  "description": "Express, Fastify and Koa middlewares, and Hapi plugin for CLS-based request id generation, batteries included",
+  "version": "2.1.0",
+  "description": "Express & Koa middlewares and Fastify & Hapi plugins for CLS-based request id generation, batteries included",
   "author": {
     "name": "Andrey Pechkurov",
     "url": "https://github.com/puzpuzpuz"

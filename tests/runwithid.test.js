@@ -1,7 +1,7 @@
 /* global describe, test, expect */
 'use strict'
 
-const { runWithId, id } = require('../src/middleware')
+const { runWithId, id } = require('../index')
 
 describe('runWithId', () => {
   test('runs function in scope of generated id', (done) => {

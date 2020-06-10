@@ -9,7 +9,7 @@ const {
   hapiPlugin,
   runWithId,
   id
-} = require('./src/middleware')
+} = require('./src/rtracer')
 
 module.exports = {
   expressMiddleware,
