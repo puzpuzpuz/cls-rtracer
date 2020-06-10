@@ -129,9 +129,7 @@ async function find (entityId) {
 
 ### Legacy Fastify middleware
 
-There is a connect-style middleware available for Fastify, but it is deprecated and may be removed
-in one of upcoming releases. If you happen to use it in your application, you should migrate to
-the Fastify plugin.
+There is a connect-style middleware available for Fastify, but it is deprecated and may be removed in one of upcoming releases. If you happen to use it in your application, you should migrate to the Fastify plugin.
 
 ```js
 fastify.use(rTracer.fastifyMiddleware())
@@ -284,9 +282,9 @@ const logger = createLogger({
 
 Complete samples for Express, Fastify and Koa are available in `/samples/` directory.
 
-## Middleware/plugin configuration
+## Configuration
 
-These are the available config options for the middleware functions. All config entries are optional.
+These are the available config options for the middleware/plugin functions. All config entries are optional.
 
 ```javascript
 {
