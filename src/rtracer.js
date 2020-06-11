@@ -42,7 +42,7 @@ const expressMiddleware = ({
 }
 
 /**
- * Generates a request tracer plugin for Fastify.
+ * Request tracer plugin for Fastify.
  *
  * @param {Object} options possible options
  * @param {boolean} options.useHeader respect request header flag
@@ -52,33 +52,33 @@ const expressMiddleware = ({
  * @param {boolean} options.useFastifyRequestId respect Fastify request id flag
  *                                    (default: `false`)
  */
-const fastifyPlugin = ({
-  useHeader = false,
-  headerName = 'X-Request-Id',
-  useFastifyRequestId = false
-} = {}) => {
-  const plugin = (fastify, _, next) => {
-    fastify.addHook('onRequest', (request, reply, done) => {
-      let requestId
-      if (useHeader) {
-        requestId = request.headers[headerName.toLowerCase()]
-      }
-      if (useFastifyRequestId) {
-        requestId = requestId || request.id
-      }
-      requestId = requestId || uuidv1()
+const fastifyPlugin = (fastify, options, next) => {
+  const {
+    useHeader = false,
+    headerName = 'X-Request-Id',
+    useFastifyRequestId = false
+  } = options
 
-      als.run(requestId, () => {
-        wrapHttpEmitters(request.raw, reply.res)
-        done()
-      })
+  fastify.addHook('onRequest', (request, reply, done) => {
+    let requestId
+    if (useHeader) {
+      requestId = request.headers[headerName.toLowerCase()]
+    }
+    if (useFastifyRequestId) {
+      requestId = requestId || request.id
+    }
+    requestId = requestId || uuidv1()
+
+    als.run(requestId, () => {
+      wrapHttpEmitters(request.raw, reply.res)
+      done()
     })
-    next()
-  }
-  plugin[Symbol.for('skip-override')] = true
-  plugin[Symbol.for('fastify.display-name')] = pluginName
-  return plugin
+  })
+  next()
 }
+
+fastifyPlugin[Symbol.for('skip-override')] = true
+fastifyPlugin[Symbol.for('fastify.display-name')] = pluginName
 
 /**
  * Generates a request tracer middleware for Koa v2.
@@ -138,7 +138,7 @@ const koaV1Middleware = ({
 }
 
 /**
- * A request tracer plugin for Hapi.
+ * Request tracer plugin for Hapi.
  *
  * @type {{once: boolean, name: string, register: hapiPlugin.register}}
  */
@@ -181,8 +181,8 @@ const runWithId = (fn, id) => {
 }
 
 /**
- * Returns request tracer id or `undefined` in case if the call is made from
- * an outside CLS context.
+ * Returns request tracer id or `undefined` in case if the call
+ * is made outside of the CLS context.
  */
 const id = () => als.getStore()
 

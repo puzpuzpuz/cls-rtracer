@@ -31,10 +31,8 @@ export declare const expressMiddleware: (
 ) => void
 
 export declare const fastifyPlugin: (
-  options?: IFastifyOptions,
-) => (
   fastify: any,
-  options: any,
+  options: IFastifyOptions,
   done: (err?: any) => void,
 ) => void
 
