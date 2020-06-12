@@ -87,18 +87,18 @@ Use the plugin provided by the library:
 const fastify = require('fastify')()
 const rTracer = require('cls-rtracer')
 
-// any third party middleware that does not need access to request ids goes here
+// any third party plugin that does not need access to request ids goes here
 // ...
 
-fastify.use(rTracer.fastifyPlugin())
-// optionally, you can override default middleware config:
-// fastify.use(rTracer.fastifyPlugin({
+fastify.register(rTracer.fastifyPlugin)
+// optionally, you can override default plugin config:
+// fastify.register(rTracer.fastifyPlugin, {
 //   useHeader: true,
 //   headerName: 'X-Your-Request-Header',
 //   useFastifyRequestId: true
 // }))
 
-// all code in middlewares, starting from here, has access to request ids
+// all code in plugins or handlers, starting from here, has access to request ids
 ```
 
 Obtain request id in middlewares on the incoming request:
@@ -204,12 +204,12 @@ const init = async () => {
   // ...
 
   await server.register({
-    plugin: rtracer.hapiPlugin
+    plugin: rTracer.hapiPlugin
   })
 
   // optionally, you can override default middleware config:
   //  await server.register({
-  //    plugin: rtracer.hapiPlugin,
+  //    plugin: rTracer.hapiPlugin,
   //    options: {
   //      useHeader: true,
   //      headerName: 'X-Your-Request-Header'

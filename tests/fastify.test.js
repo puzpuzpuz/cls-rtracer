@@ -13,7 +13,7 @@ const types = [pluginType, middlewareType]
 const register = (type, app, options) => {
   switch (type) {
     case pluginType:
-      return app.register(rTracer.fastifyPlugin(options))
+      return app.register(rTracer.fastifyPlugin, options)
     case middlewareType:
       return app.use(rTracer.fastifyMiddleware(options))
     default:
