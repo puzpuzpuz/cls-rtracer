@@ -59,6 +59,6 @@ export declare const koaV1Middleware: (
 
 export declare const hapiPlugin: IHapiPlugin<IOptions>
 
-export declare function runWithId<T>(fn: () => T, id?: string): T
+export declare function runWithId<T>(fn: () => T, id?: unknown): T
 
-export declare const id: () => string | undefined
+export declare const id: () => unknown | undefined
