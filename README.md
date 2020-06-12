@@ -101,10 +101,10 @@ fastify.register(rTracer.fastifyPlugin)
 // all code in plugins or handlers, starting from here, has access to request ids
 ```
 
-Obtain request id in middlewares on the incoming request:
+Obtain request id in handlers on the incoming request:
 
 ```javascript
-// an example middleware for a generic find entity endpoint
+// an example handler for a generic find entity endpoint
 // router config is skipped for the sake of simplicity
 app.get('/test', async (request, reply) => {
   const entity = await entityService.find(request.params.id)
