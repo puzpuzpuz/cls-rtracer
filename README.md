@@ -9,7 +9,7 @@ Request Tracer - Express & Koa middlewares and Fastify & Hapi plugins for CLS-ba
 
 Automatically generates a UUID V1 value as the id for each request and stores it in `AsyncLocalStorage` (CLS core API, see [this blog post](https://itnext.io/one-node-js-cls-api-to-rule-them-all-1670ac66a9e8)). Optionally, if the request contains `X-Request-Id` header, uses its value instead. Allows to obtain the generated request id anywhere in your routes later and use it for logging or any other purposes.
 
-Tested and works fine with Express v4, Fastify v2, Koa (both v1 and v2), and Hapi v18.
+Tested and works fine with Express v4, Fastify v2 and v3, Koa v1 and v2, and Hapi v18.
 
 ## Supported Node.js versions
 
