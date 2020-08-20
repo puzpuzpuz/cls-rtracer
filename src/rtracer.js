@@ -70,7 +70,7 @@ const fastifyPlugin = (fastify, options, next) => {
     requestId = requestId || uuidv1()
 
     als.run(requestId, () => {
-      wrapHttpEmitters(request.raw, reply.res)
+      wrapHttpEmitters(request.raw, reply.raw || reply.res)
       done()
     })
   })
