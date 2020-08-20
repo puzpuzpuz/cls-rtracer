@@ -22,7 +22,7 @@ const register = (type, app, options) => {
 }
 
 for (const type of types) {
-  describe(`cls-rtracer for Fastify@2 - ${type}`, () => {
+  describe(`cls-rtracer for Fastify v2 - ${type}`, () => {
     test('does not return id outside of request', () => {
       const id = rTracer.id()
       expect(id).toBeUndefined()
