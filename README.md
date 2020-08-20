@@ -129,7 +129,7 @@ async function find (entityId) {
 
 ### Legacy Fastify middleware
 
-There is a connect-style middleware available for Fastify, but it is deprecated and may be removed in one of upcoming releases. If you happen to use it in your application, you should migrate to the Fastify plugin.
+There is a connect-style middleware available for Fastify v2, but it is deprecated and may be removed in one of upcoming releases. If you happen to use it in your application, you should migrate to the Fastify plugin.
 
 ```js
 fastify.use(rTracer.fastifyMiddleware())
