@@ -51,6 +51,26 @@ describe('cls-rtracer for Fastify', () => {
     app.ready().then(() => request(app.server).get('/test')).catch(done)
   })
 
+  test('uses request id factory when provided', () => {
+    const app = Fastify()
+    const idFactory = () => 'generated-id'
+
+    app.register(rTracer.fastifyPlugin, {
+      requestIdFactory: idFactory
+    })
+
+    app.get('/test', async (_, reply) => {
+      const id = rTracer.id()
+      reply.send({ id })
+    })
+
+    return app.ready().then(() => request(app.server).get('/test'))
+      .then(res => {
+        expect(res.statusCode).toBe(200)
+        expect(res.body.id).toEqual(idFactory())
+      })
+  })
+
   test('ignores header by default', () => {
     const app = Fastify()
     app.register(rTracer.fastifyPlugin)

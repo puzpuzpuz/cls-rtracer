@@ -1,10 +1,14 @@
 import { IncomingMessage, ServerResponse } from 'http'
 
+export type RequestIdFactory = () => string
+
 export interface IOptions {
   // Default: false
   useHeader?: boolean
   // Default: 'X-Request-Id'
   headerName?: string
+  // Default: UUID v1
+  requestIdFactory?: RequestIdFactory
 }
 
 export interface IFastifyOptions {
@@ -14,6 +18,8 @@ export interface IFastifyOptions {
   headerName?: string
   // Default: false
   useFastifyRequestId?: boolean
+  // Default: UUID v1
+  requestIdFactory?: RequestIdFactory
 }
 
 export interface IHapiPlugin<T> {

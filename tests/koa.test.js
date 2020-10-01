@@ -51,6 +51,26 @@ describe('cls-rtracer for Koa', () => {
     request(app.callback()).get('/').catch(done)
   })
 
+  test('uses request id factory when provided', () => {
+    const app = new Koa()
+    const idFactory = () => 'generated-id'
+
+    app.use(rTracer.koaMiddleware({
+      requestIdFactory: idFactory
+    }))
+
+    app.use((ctx) => {
+      const id = rTracer.id()
+      ctx.body = { id }
+    })
+
+    return request(app.callback()).get('/')
+      .then(res => {
+        expect(res.statusCode).toBe(200)
+        expect(res.body.id).toEqual(idFactory())
+      })
+  })
+
   test('ignores header by default', () => {
     const app = new Koa()
     app.use(rTracer.koaMiddleware())
