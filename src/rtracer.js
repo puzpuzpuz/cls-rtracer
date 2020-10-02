@@ -22,7 +22,7 @@ const wrapHttpEmitters = (req, res) => {
  *                                    (default: `false`)
  * @param {string} options.headerName request header name, used if `useHeader` is set to `true`
  *                                    (default: `X-Request-Id`)
- * @param {() => string} options.requestIdFactory function used to generate request ids
+ * @param {function} options.requestIdFactory function used to generate request ids
  *                                    (default: UUIDs v1)
  */
 const expressMiddleware = ({
@@ -54,7 +54,7 @@ const expressMiddleware = ({
  *                                    (default: `X-Request-Id`)
  * @param {boolean} options.useFastifyRequestId respect Fastify request id flag
  *                                    (default: `false`)
- * @param {() => string} options.requestIdFactory function used to generate request ids
+ * @param {function} options.requestIdFactory function used to generate request ids
  *                                    (default: UUIDs v1)
  */
 const fastifyPlugin = (fastify, options, next) => {
@@ -94,7 +94,7 @@ fastifyPlugin[Symbol.for('fastify.display-name')] = pluginName
  *                                    (default: `false`)
  * @param {string} options.headerName request header name, used if `useHeader` is set to `true`
  *                                    (default: `X-Request-Id`)
- * @param {() => string} options.requestIdFactory function used to generate request ids
+ * @param {function} options.requestIdFactory function used to generate request ids
  *                                    (default: UUIDs v1)
  */
 const koaMiddleware = ({
@@ -124,7 +124,7 @@ const koaMiddleware = ({
  *                                    (default: `false`)
  * @param {string} options.headerName request header name, used if `useHeader` is set to `true`
  *                                    (default: `X-Request-Id`)
- * @param {() => string} options.requestIdFactory function used to generate request ids
+ * @param {function} options.requestIdFactory function used to generate request ids
  *                                    (default: UUIDs v1)
  */
 const koaV1Middleware = ({

@@ -87,7 +87,7 @@ describe('cls-rtracer for Hapi', () => {
 
     server = await setupServer({
       options: {
-        requestIdFactory: idFactory,
+        requestIdFactory: idFactory
       },
       handler: () => {
         const id = rTracer.id()
