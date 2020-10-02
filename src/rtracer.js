@@ -22,17 +22,20 @@ const wrapHttpEmitters = (req, res) => {
  *                                    (default: `false`)
  * @param {string} options.headerName request header name, used if `useHeader` is set to `true`
  *                                    (default: `X-Request-Id`)
+ * @param {function} options.requestIdFactory function used to generate request ids
+ *                                    (default: UUIDs v1)
  */
 const expressMiddleware = ({
   useHeader = false,
-  headerName = 'X-Request-Id'
+  headerName = 'X-Request-Id',
+  requestIdFactory = uuidv1
 } = {}) => {
   return (req, res, next) => {
     let requestId
     if (useHeader) {
       requestId = req.headers[headerName.toLowerCase()]
     }
-    requestId = requestId || uuidv1()
+    requestId = requestId || requestIdFactory()
 
     als.run(requestId, () => {
       wrapHttpEmitters(req, res)
@@ -51,12 +54,15 @@ const expressMiddleware = ({
  *                                    (default: `X-Request-Id`)
  * @param {boolean} options.useFastifyRequestId respect Fastify request id flag
  *                                    (default: `false`)
+ * @param {function} options.requestIdFactory function used to generate request ids
+ *                                    (default: UUIDs v1)
  */
 const fastifyPlugin = (fastify, options, next) => {
   const {
     useHeader = false,
     headerName = 'X-Request-Id',
-    useFastifyRequestId = false
+    useFastifyRequestId = false,
+    requestIdFactory = uuidv1
   } = options
 
   fastify.addHook('onRequest', (request, reply, done) => {
@@ -67,7 +73,7 @@ const fastifyPlugin = (fastify, options, next) => {
     if (useFastifyRequestId) {
       requestId = requestId || request.id
     }
-    requestId = requestId || uuidv1()
+    requestId = requestId || requestIdFactory()
 
     als.run(requestId, () => {
       wrapHttpEmitters(request.raw, reply.raw || reply.res)
@@ -88,17 +94,20 @@ fastifyPlugin[Symbol.for('fastify.display-name')] = pluginName
  *                                    (default: `false`)
  * @param {string} options.headerName request header name, used if `useHeader` is set to `true`
  *                                    (default: `X-Request-Id`)
+ * @param {function} options.requestIdFactory function used to generate request ids
+ *                                    (default: UUIDs v1)
  */
 const koaMiddleware = ({
   useHeader = false,
-  headerName = 'X-Request-Id'
+  headerName = 'X-Request-Id',
+  requestIdFactory = uuidv1
 } = {}) => {
   return (ctx, next) => {
     let requestId
     if (useHeader) {
       requestId = ctx.request.headers[headerName.toLowerCase()]
     }
-    requestId = requestId || uuidv1()
+    requestId = requestId || requestIdFactory()
 
     return als.run(requestId, () => {
       wrapHttpEmitters(ctx.req, ctx.res)
@@ -115,17 +124,20 @@ const koaMiddleware = ({
  *                                    (default: `false`)
  * @param {string} options.headerName request header name, used if `useHeader` is set to `true`
  *                                    (default: `X-Request-Id`)
+ * @param {function} options.requestIdFactory function used to generate request ids
+ *                                    (default: UUIDs v1)
  */
 const koaV1Middleware = ({
   useHeader = false,
-  headerName = 'X-Request-Id'
+  headerName = 'X-Request-Id',
+  requestIdFactory = uuidv1
 } = {}) => {
   return function * (next) {
     let requestId
     if (useHeader) {
       requestId = this.request.headers[headerName.toLowerCase()]
     }
-    requestId = requestId || uuidv1()
+    requestId = requestId || requestIdFactory()
 
     als.enterWith(requestId)
     try {
@@ -148,7 +160,8 @@ const hapiPlugin = ({
   register: async (server, options) => {
     const {
       useHeader = false,
-      headerName = 'X-Request-Id'
+      headerName = 'X-Request-Id',
+      requestIdFactory = uuidv1
     } = options
 
     server.ext('onRequest', (request, h) => {
@@ -156,7 +169,7 @@ const hapiPlugin = ({
       if (useHeader) {
         requestId = request.headers[headerName.toLowerCase()]
       }
-      requestId = requestId || uuidv1()
+      requestId = requestId || requestIdFactory()
       als.enterWith(requestId)
       wrapHttpEmitters(request.raw.req, request.raw.res)
 
