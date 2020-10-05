@@ -262,4 +262,61 @@ describe('cls-rtracer for Koa', () => {
       expect(id1).not.toEqual(id2)
     })
   })
+
+  test('does not echo the header when the option is not set', () => {
+    const app = new Koa()
+    app.use(rTracer.koaMiddleware())
+
+    let id
+
+    app.use((ctx) => {
+      id = rTracer.id()
+      ctx.body = { id }
+    })
+
+    return request(app.callback()).get('/')
+      .then(res => {
+        expect(res.statusCode).toBe(200)
+        expect(res.headers['x-request-id']).toEqual(undefined)
+      })
+  })
+
+  test('echoes the header when the option is set', () => {
+    const app = new Koa()
+    app.use(rTracer.koaMiddleware({ echoHeader: true }))
+
+    let id
+
+    app.use((ctx) => {
+      id = rTracer.id()
+      ctx.body = { id }
+    })
+
+    return request(app.callback()).get('/')
+      .then(res => {
+        expect(res.statusCode).toBe(200)
+        expect(res.headers['x-request-id']).toEqual(id)
+      })
+  })
+
+  test('echoes the header when the option is set and a custom header is defined', () => {
+    const app = new Koa()
+    app.use(rTracer.koaMiddleware({
+      echoHeader: true, 
+      headerName: 'x-another-req-id'
+    }))
+
+    let id
+
+    app.use((ctx) => {
+      id = rTracer.id()
+      ctx.body = { id }
+    })
+
+    return request(app.callback()).get('/')
+      .then(res => {
+        expect(res.statusCode).toBe(200)
+        expect(res.headers['x-another-req-id']).toEqual(id)
+      })
+  })
 })
