@@ -92,6 +92,8 @@ fastifyPlugin[Symbol.for('fastify.display-name')] = pluginName
  * @param {Object} options possible options
  * @param {boolean} options.useHeader respect request header flag
  *                                    (default: `false`)
+ * @param {boolean} options.echoHeader injects `headerName` header into the response
+ *                                    (default: `false`)
  * @param {string} options.headerName request header name, used if `useHeader` is set to `true`
  *                                    (default: `X-Request-Id`)
  * @param {function} options.requestIdFactory function used to generate request ids
@@ -100,7 +102,8 @@ fastifyPlugin[Symbol.for('fastify.display-name')] = pluginName
 const koaMiddleware = ({
   useHeader = false,
   headerName = 'X-Request-Id',
-  requestIdFactory = uuidv1
+  requestIdFactory = uuidv1,
+  echoHeader = false
 } = {}) => {
   return (ctx, next) => {
     let requestId
@@ -108,6 +111,10 @@ const koaMiddleware = ({
       requestId = ctx.request.headers[headerName.toLowerCase()]
     }
     requestId = requestId || requestIdFactory()
+
+    if (echoHeader) {
+      ctx.set(headerName, requestId)
+    }
 
     return als.run(requestId, () => {
       wrapHttpEmitters(ctx.req, ctx.res)

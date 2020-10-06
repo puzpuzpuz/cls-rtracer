@@ -152,6 +152,8 @@ app.use(rTracer.koaMiddleware())
 // app.use(rTracer.koaMiddleware({
 //   useHeader: true,
 //   headerName: 'X-Your-Request-Header'
+// Use this to inject the id into the response as the `headerName` header
+//   echoHeader: true
 // }))
 
 // all code in middlewares, starting from here, has access to request ids

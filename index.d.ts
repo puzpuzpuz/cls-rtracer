@@ -11,6 +11,11 @@ export interface IOptions {
   requestIdFactory?: RequestIdFactory
 }
 
+export interface IKoaOptions extends IOptions {
+  // Default: false
+  echoHeader?: boolean
+}
+
 export interface IFastifyOptions {
   // Default: false
   useHeader?: boolean
@@ -51,7 +56,7 @@ export declare const fastifyMiddleware: (
 ) => void
 
 export declare const koaMiddleware: (
-  options?: IOptions,
+  options?: IKoaOptions,
 ) => (
   ctx: { request: IncomingMessage; response: ServerResponse },
   next: () => Promise<void>,
