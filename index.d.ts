@@ -9,9 +9,6 @@ export interface IOptions {
   headerName?: string
   // Default: UUID v1
   requestIdFactory?: RequestIdFactory
-}
-
-export interface IKoaOptions extends IOptions {
   // Default: false
   echoHeader?: boolean
 }
@@ -56,7 +53,7 @@ export declare const fastifyMiddleware: (
 ) => void
 
 export declare const koaMiddleware: (
-  options?: IKoaOptions,
+  options?: IOptions,
 ) => (
   ctx: { request: IncomingMessage; response: ServerResponse },
   next: () => Promise<void>,
