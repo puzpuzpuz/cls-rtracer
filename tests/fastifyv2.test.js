@@ -349,5 +349,62 @@ for (const type of types) {
         expect(id1).not.toEqual(id2)
       })
     })
+
+    test('does not echo the header when the option is not set', () => {
+      const app = Fastify()
+      register(type, app)
+
+      app.get('/test', async (_, reply) => {
+        const id = rTracer.id()
+        reply.send({ id })
+      })
+
+      return app.ready().then(() => request(app.server).get('/test'))
+        .then(res => {
+          expect(res.statusCode).toBe(200)
+          expect(res.headers['x-request-id']).toEqual(undefined)
+        })
+    })
+
+    test('echoes the header when the option is set and a custom header is not defined', () => {
+      const app = Fastify()
+      register(type, app, {
+        echoHeader: true
+      })
+
+      let id
+
+      app.get('/test', async (_, reply) => {
+        id = rTracer.id()
+        reply.send({ id })
+      })
+
+      return app.ready().then(() => request(app.server).get('/test'))
+        .then(res => {
+          expect(res.statusCode).toBe(200)
+          expect(res.headers['x-request-id']).toEqual(id)
+        })
+    })
+
+    test('echoes the header when the option is set and a custom header is defined', () => {
+      const app = Fastify()
+      register(type, app, {
+        echoHeader: true,
+        headerName: 'x-another-req-id'
+      })
+
+      let id
+
+      app.get('/test', async (_, reply) => {
+        id = rTracer.id()
+        reply.send({ id })
+      })
+
+      return app.ready().then(() => request(app.server).get('/test'))
+        .then(res => {
+          expect(res.statusCode).toBe(200)
+          expect(res.headers['x-another-req-id']).toEqual(id)
+        })
+    })
   })
 }

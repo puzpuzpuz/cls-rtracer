@@ -297,4 +297,61 @@ describe('cls-rtracer for Express', () => {
       expect(id1).not.toEqual(id2)
     })
   })
+
+  test('does not echo the header when the option is not set', () => {
+    const app = express()
+    app.use(rTracer.expressMiddleware())
+
+    app.get('/test', (req, res) => {
+      const id = rTracer.id()
+      res.json({ id })
+    })
+
+    return request(app).get('/test')
+      .then(res => {
+        expect(res.statusCode).toBe(200)
+        expect(res.headers['x-request-id']).toEqual(undefined)
+      })
+  })
+
+  test('echoes the header when the option is set and a custom header is not defined', () => {
+    const app = express()
+    app.use(rTracer.expressMiddleware({
+      echoHeader: true
+    }))
+
+    let id
+
+    app.get('/test', (req, res) => {
+      id = rTracer.id()
+      res.json({ id })
+    })
+
+    return request(app).get('/test')
+      .then(res => {
+        expect(res.statusCode).toBe(200)
+        expect(res.headers['x-request-id']).toEqual(id)
+      })
+  })
+
+  test('echoes the header when the option is set and a custom header is defined', () => {
+    const app = express()
+    app.use(rTracer.expressMiddleware({
+      echoHeader: true,
+      headerName: 'x-another-req-id'
+    }))
+
+    let id
+
+    app.get('/test', (req, res) => {
+      id = rTracer.id()
+      res.json({ id })
+    })
+
+    return request(app).get('/test')
+      .then(res => {
+        expect(res.statusCode).toBe(200)
+        expect(res.headers['x-another-req-id']).toEqual(id)
+      })
+  })
 })

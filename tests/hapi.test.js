@@ -287,4 +287,66 @@ describe('cls-rtracer for Hapi', () => {
     expect(res2.result.id).toEqual(ids.id2)
     expect(res1.result.id).not.toEqual(res2.result.id)
   })
+
+  test('does not echo the header when the option is not set', async () => {
+    server = await setupServer({
+      handler: () => {
+        const id = rTracer.id()
+        return { id }
+      }
+    })
+
+    const res = await server.inject({
+      method: 'get',
+      url: '/'
+    })
+
+    expect(res.statusCode).toBe(200)
+    expect(res.headers['x-request-id']).toEqual(undefined)
+  })
+
+  test('echoes the header when the option is set and a custom header is not defined', async () => {
+    let id
+
+    server = await setupServer({
+      options: {
+        echoHeader: true
+      },
+      handler: () => {
+        id = rTracer.id()
+        return { id }
+      }
+    })
+
+    const res = await server.inject({
+      method: 'get',
+      url: '/'
+    })
+
+    expect(res.statusCode).toBe(200)
+    expect(res.headers['x-request-id']).toEqual(id)
+  })
+
+  test('echoes the header when the option is set and a custom header is defined', async () => {
+    let id
+
+    server = await setupServer({
+      options: {
+        echoHeader: true,
+        headerName: 'x-another-req-id'
+      },
+      handler: () => {
+        id = rTracer.id()
+        return { id }
+      }
+    })
+
+    const res = await server.inject({
+      method: 'get',
+      url: '/'
+    })
+
+    expect(res.statusCode).toBe(200)
+    expect(res.headers['x-another-req-id']).toEqual(id)
+  })
 })

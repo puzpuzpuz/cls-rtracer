@@ -14,33 +14,53 @@ const wrapHttpEmitters = (req, res) => {
   wrapEmitter(res, asyncResource)
 }
 
-/**
- * Generates a request tracer middleware for Express.
- *
- * @param {Object} options possible options
- * @param {boolean} options.useHeader respect request header flag
- *                                    (default: `false`)
- * @param {string} options.headerName request header name, used if `useHeader` is set to `true`
- *                                    (default: `X-Request-Id`)
- * @param {function} options.requestIdFactory function used to generate request ids
- *                                    (default: UUIDs v1)
- */
-const expressMiddleware = ({
-  useHeader = false,
-  headerName = 'X-Request-Id',
-  requestIdFactory = uuidv1
-} = {}) => {
-  return (req, res, next) => {
-    let requestId
-    if (useHeader) {
-      requestId = req.headers[headerName.toLowerCase()]
-    }
-    requestId = requestId || requestIdFactory()
+const expressSetResHeaderFn = (res, headerName, requestId) => {
+  res.set(headerName, requestId)
+}
+const fastifySetResHeaderFn = (res, headerName, requestId) => {
+  res.setHeader(headerName, requestId)
+}
 
-    als.run(requestId, () => {
-      wrapHttpEmitters(req, res)
-      next()
-    })
+/**
+ * Generates a function to generate tracer middleware for Express/Fastify.
+ * @param setResHeaderFn {function} function used to set response header
+ */
+const expressMiddleware = (setResHeaderFn) => {
+  /**
+   * Generates a request tracer middleware for Express/Fastify.
+   *
+   * @param {Object} options possible options
+   * @param {boolean} options.useHeader respect request header flag
+   *                                    (default: `false`)
+   * @param {string} options.headerName request header name, used if `useHeader`/`echoHeader` is set to `true`
+   *                                    (default: `X-Request-Id`)
+   * @param {function} options.requestIdFactory function used to generate request ids
+   *                                    (default: UUIDs v1)
+   * @param {boolean} options.echoHeader injects `headerName` header into the response
+   *                                    (default: `false`)
+   */
+  return ({
+    useHeader = false,
+    headerName = 'X-Request-Id',
+    requestIdFactory = uuidv1,
+    echoHeader = false
+  } = {}) => {
+    return (req, res, next) => {
+      let requestId
+      if (useHeader) {
+        requestId = req.headers[headerName.toLowerCase()]
+      }
+      requestId = requestId || requestIdFactory()
+
+      if (echoHeader) {
+        setResHeaderFn(res, headerName, requestId)
+      }
+
+      als.run(requestId, () => {
+        wrapHttpEmitters(req, res)
+        next()
+      })
+    }
   }
 }
 
@@ -50,19 +70,22 @@ const expressMiddleware = ({
  * @param {Object} options possible options
  * @param {boolean} options.useHeader respect request header flag
  *                                    (default: `false`)
- * @param {string} options.headerName request header name, used if `useHeader` is set to `true`
+ * @param {string} options.headerName request header name, used if `useHeader`/`echoHeader` is set to `true`
  *                                    (default: `X-Request-Id`)
  * @param {boolean} options.useFastifyRequestId respect Fastify request id flag
  *                                    (default: `false`)
  * @param {function} options.requestIdFactory function used to generate request ids
  *                                    (default: UUIDs v1)
+ * @param {boolean} options.echoHeader injects `headerName` header into the response
+ *                                    (default: `false`)
  */
 const fastifyPlugin = (fastify, options, next) => {
   const {
     useHeader = false,
     headerName = 'X-Request-Id',
     useFastifyRequestId = false,
-    requestIdFactory = uuidv1
+    requestIdFactory = uuidv1,
+    echoHeader = false
   } = options
 
   fastify.addHook('onRequest', (request, reply, done) => {
@@ -74,6 +97,10 @@ const fastifyPlugin = (fastify, options, next) => {
       requestId = requestId || request.id
     }
     requestId = requestId || requestIdFactory()
+
+    if (echoHeader) {
+      reply.header(headerName, requestId)
+    }
 
     als.run(requestId, () => {
       wrapHttpEmitters(request.raw, reply.raw || reply.res)
@@ -92,12 +119,12 @@ fastifyPlugin[Symbol.for('fastify.display-name')] = pluginName
  * @param {Object} options possible options
  * @param {boolean} options.useHeader respect request header flag
  *                                    (default: `false`)
- * @param {boolean} options.echoHeader injects `headerName` header into the response
- *                                    (default: `false`)
- * @param {string} options.headerName request header name, used if `useHeader` is set to `true`
+ * @param {string} options.headerName request header name, used if `useHeader`/`echoHeader` is set to `true`
  *                                    (default: `X-Request-Id`)
  * @param {function} options.requestIdFactory function used to generate request ids
  *                                    (default: UUIDs v1)
+ * @param {boolean} options.echoHeader injects `headerName` header into the response
+ *                                    (default: `false`)
  */
 const koaMiddleware = ({
   useHeader = false,
@@ -129,15 +156,18 @@ const koaMiddleware = ({
  * @param {Object} options possible options
  * @param {boolean} options.useHeader respect request header flag
  *                                    (default: `false`)
- * @param {string} options.headerName request header name, used if `useHeader` is set to `true`
+ * @param {string} options.headerName request header name, used if `useHeader`/`echoHeader` is set to `true`
  *                                    (default: `X-Request-Id`)
  * @param {function} options.requestIdFactory function used to generate request ids
  *                                    (default: UUIDs v1)
+ * @param {boolean} options.echoHeader injects `headerName` header into the response
+ *                                    (default: `false`)
  */
 const koaV1Middleware = ({
   useHeader = false,
   headerName = 'X-Request-Id',
-  requestIdFactory = uuidv1
+  requestIdFactory = uuidv1,
+  echoHeader = false
 } = {}) => {
   return function * (next) {
     let requestId
@@ -145,6 +175,10 @@ const koaV1Middleware = ({
       requestId = this.request.headers[headerName.toLowerCase()]
     }
     requestId = requestId || requestIdFactory()
+
+    if (echoHeader) {
+      this.response.set(headerName, requestId)
+    }
 
     als.enterWith(requestId)
     try {
@@ -168,7 +202,8 @@ const hapiPlugin = ({
     const {
       useHeader = false,
       headerName = 'X-Request-Id',
-      requestIdFactory = uuidv1
+      requestIdFactory = uuidv1,
+      echoHeader = false
     } = options
 
     server.ext('onRequest', (request, h) => {
@@ -177,11 +212,19 @@ const hapiPlugin = ({
         requestId = request.headers[headerName.toLowerCase()]
       }
       requestId = requestId || requestIdFactory()
+
       als.enterWith(requestId)
       wrapHttpEmitters(request.raw.req, request.raw.res)
 
       return h.continue
     })
+
+    if (echoHeader) {
+      server.ext('onPreResponse', async (request, h) => {
+        request.response.header(headerName, id())
+        return h.continue
+      })
+    }
 
     server.events.on('response', () => {
       als.enterWith(undefined)
@@ -207,9 +250,9 @@ const runWithId = (fn, id) => {
 const id = () => als.getStore()
 
 module.exports = {
-  expressMiddleware,
+  expressMiddleware: expressMiddleware(expressSetResHeaderFn),
   fastifyPlugin,
-  fastifyMiddleware: expressMiddleware,
+  fastifyMiddleware: expressMiddleware(fastifySetResHeaderFn),
   koaMiddleware,
   koaV1Middleware,
   hapiPlugin,
