@@ -14,14 +14,18 @@ const wrapHttpEmitters = (req, res) => {
   wrapEmitter(res, asyncResource)
 }
 
-const expressSetResHeaderFnName = 'set'
-const fastifySetResHeaderFnName = 'setHeader'
+const expressSetResHeaderFn = (res, headerName, requestId) => {
+  res.set(headerName, requestId)
+}
+const fastifySetResHeaderFn = (res, headerName, requestId) => {
+  res.setHeader(headerName, requestId)
+}
 
 /**
  * Generates a function to generate tracer middleware for Express/Fastify.
- * @param setResHeaderFnName {string} name of a function to set response header
+ * @param setResHeaderFn {function} function used to set response header
  */
-const expressMiddleware = (setResHeaderFnName) => {
+const expressMiddleware = (setResHeaderFn) => {
   /**
    * Generates a request tracer middleware for Express/Fastify.
    *
@@ -49,7 +53,7 @@ const expressMiddleware = (setResHeaderFnName) => {
       requestId = requestId || requestIdFactory()
 
       if (echoHeader) {
-        res[setResHeaderFnName](headerName, requestId)
+        setResHeaderFn(res, headerName, requestId)
       }
 
       als.run(requestId, () => {
@@ -215,13 +219,12 @@ const hapiPlugin = ({
       return h.continue
     })
 
-    server.ext('onPreResponse', async (request, h) => {
-      if (echoHeader) {
+    if (echoHeader) {
+      server.ext('onPreResponse', async (request, h) => {
         request.response.header(headerName, id())
-      }
-
-      return h.continue
-    })
+        return h.continue
+      })
+    }
 
     server.events.on('response', () => {
       als.enterWith(undefined)
@@ -247,9 +250,9 @@ const runWithId = (fn, id) => {
 const id = () => als.getStore()
 
 module.exports = {
-  expressMiddleware: expressMiddleware(expressSetResHeaderFnName),
+  expressMiddleware: expressMiddleware(expressSetResHeaderFn),
   fastifyPlugin,
-  fastifyMiddleware: expressMiddleware(fastifySetResHeaderFnName),
+  fastifyMiddleware: expressMiddleware(fastifySetResHeaderFn),
   koaMiddleware,
   koaV1Middleware,
   hapiPlugin,

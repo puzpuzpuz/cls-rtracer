@@ -22,6 +22,8 @@ export interface IFastifyOptions {
   useFastifyRequestId?: boolean
   // Default: UUID v1
   requestIdFactory?: RequestIdFactory
+  // Default: false
+  echoHeader?: boolean
 }
 
 export interface IHapiPlugin<T> {
