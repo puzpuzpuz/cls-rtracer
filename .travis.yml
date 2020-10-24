@@ -1,8 +1,8 @@
 language: node_js
 node_js:
   - "12.17"
-  - "13.14"
   - "14"
+  - "15"
 install:
   - npm install
 script:
