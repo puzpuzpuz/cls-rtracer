@@ -59,19 +59,19 @@
     "logging"
   ],
   "dependencies": {
-    "uuid": "8.1.0"
+    "uuid": "8.3.1"
   },
   "devDependencies": {
-    "@hapi/hapi": "^19.1.1",
+    "@hapi/hapi": "^20.0.1",
     "coveralls": "^3.1.0",
     "express": "^4.17.1",
-    "fastify": "^3.2.1",
+    "fastify": "^3.7.0",
     "fastifyv2": "npm:fastify@^2.14.1",
-    "jest": "^26.0.1",
-    "koa": "^2.12.0",
+    "jest": "^26.6.1",
+    "koa": "^2.13.0",
     "koav1": "npm:koa@^1.7.0",
-    "standard": "^14.3.4",
-    "supertest": "^4.0.2",
-    "winston": "^3.2.1"
+    "standard": "^15.0.0",
+    "supertest": "^5.0.0",
+    "winston": "^3.3.3"
   }
 }
