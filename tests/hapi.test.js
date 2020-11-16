@@ -349,4 +349,26 @@ describe('cls-rtracer for Hapi', () => {
     expect(res.statusCode).toBe(200)
     expect(res.headers['x-another-req-id']).toEqual(id)
   })
+
+  test('echoes the header when the option is set and an error is thrown', async () => {
+    let id
+
+    server = await setupServer({
+      options: {
+        echoHeader: true
+      },
+      handler: () => {
+        id = rTracer.id()
+        throw new Error(id)
+      }
+    })
+
+    const res = await server.inject({
+      method: 'get',
+      url: '/'
+    })
+
+    expect(res.statusCode).toBe(500)
+    expect(res.headers['x-request-id']).toEqual(id)
+  })
 })
