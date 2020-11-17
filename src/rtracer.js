@@ -221,7 +221,11 @@ const hapiPlugin = ({
 
     if (echoHeader) {
       server.ext('onPreResponse', async (request, h) => {
-        request.response.header(headerName, id())
+        if (request.response.output) { // Response is a Boom error
+          request.response.output.headers[headerName] = id()
+        } else {
+          request.response.header(headerName, id())
+        }
         return h.continue
       })
     }
