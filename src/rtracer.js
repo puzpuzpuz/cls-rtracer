@@ -221,10 +221,10 @@ const hapiPlugin = ({
 
     if (echoHeader) {
       server.ext('onPreResponse', async (request, h) => {
-        if (request.response && request.response.header) {
-          request.response.header(headerName, id())
-        } else if (request.response && request.response.output && request.response.output.headers) {
+        if (request.response.isBoom) {
           request.response.output.headers[headerName] = id()
+        } else {
+          request.response.header(headerName, id())
         }
         return h.continue
       })
