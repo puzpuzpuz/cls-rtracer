@@ -1,6 +1,6 @@
 import { IncomingMessage, ServerResponse } from 'http'
 
-export type RequestIdFactory = () => unknown
+export type RequestIdFactory = (req?: IncomingMessage) => unknown
 
 export interface IOptions {
   // Default: false
