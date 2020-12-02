@@ -96,7 +96,7 @@ const fastifyPlugin = (fastify, options, next) => {
     if (useFastifyRequestId) {
       requestId = requestId || request.id
     }
-    requestId = requestId || (requestIdFactory ? requestIdFactory(request) : uuidv1())
+    requestId = requestId || (requestIdFactory ? requestIdFactory(request.raw) : uuidv1())
 
     if (echoHeader) {
       reply.header(headerName, requestId)
