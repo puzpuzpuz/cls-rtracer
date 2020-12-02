@@ -42,7 +42,7 @@ const expressMiddleware = (setResHeaderFn) => {
   return ({
     useHeader = false,
     headerName = 'X-Request-Id',
-    requestIdFactory = uuidv1,
+    requestIdFactory = null,
     echoHeader = false
   } = {}) => {
     return (req, res, next) => {
@@ -50,7 +50,7 @@ const expressMiddleware = (setResHeaderFn) => {
       if (useHeader) {
         requestId = req.headers[headerName.toLowerCase()]
       }
-      requestId = requestId || requestIdFactory(req)
+      requestId = requestId || (requestIdFactory ? requestIdFactory(req) : uuidv1())
 
       if (echoHeader) {
         setResHeaderFn(res, headerName, requestId)
@@ -84,7 +84,7 @@ const fastifyPlugin = (fastify, options, next) => {
     useHeader = false,
     headerName = 'X-Request-Id',
     useFastifyRequestId = false,
-    requestIdFactory = uuidv1,
+    requestIdFactory = null,
     echoHeader = false
   } = options
 
@@ -96,7 +96,7 @@ const fastifyPlugin = (fastify, options, next) => {
     if (useFastifyRequestId) {
       requestId = requestId || request.id
     }
-    requestId = requestId || requestIdFactory(request)
+    requestId = requestId || (requestIdFactory ? requestIdFactory(request) : uuidv1())
 
     if (echoHeader) {
       reply.header(headerName, requestId)
@@ -129,7 +129,7 @@ fastifyPlugin[Symbol.for('fastify.display-name')] = pluginName
 const koaMiddleware = ({
   useHeader = false,
   headerName = 'X-Request-Id',
-  requestIdFactory = uuidv1,
+  requestIdFactory = null,
   echoHeader = false
 } = {}) => {
   return (ctx, next) => {
@@ -137,7 +137,7 @@ const koaMiddleware = ({
     if (useHeader) {
       requestId = ctx.request.headers[headerName.toLowerCase()]
     }
-    requestId = requestId || requestIdFactory(ctx.request)
+    requestId = requestId || (requestIdFactory ? requestIdFactory(ctx.request) : uuidv1())
 
     if (echoHeader) {
       ctx.set(headerName, requestId)
@@ -166,7 +166,7 @@ const koaMiddleware = ({
 const koaV1Middleware = ({
   useHeader = false,
   headerName = 'X-Request-Id',
-  requestIdFactory = uuidv1,
+  requestIdFactory = null,
   echoHeader = false
 } = {}) => {
   return function * (next) {
@@ -174,7 +174,7 @@ const koaV1Middleware = ({
     if (useHeader) {
       requestId = this.request.headers[headerName.toLowerCase()]
     }
-    requestId = requestId || requestIdFactory(this.request)
+    requestId = requestId || (requestIdFactory ? requestIdFactory(this.request) : uuidv1())
 
     if (echoHeader) {
       this.response.set(headerName, requestId)
@@ -202,7 +202,7 @@ const hapiPlugin = ({
     const {
       useHeader = false,
       headerName = 'X-Request-Id',
-      requestIdFactory = uuidv1,
+      requestIdFactory = null,
       echoHeader = false
     } = options
 
@@ -211,7 +211,7 @@ const hapiPlugin = ({
       if (useHeader) {
         requestId = request.headers[headerName.toLowerCase()]
       }
-      requestId = requestId || requestIdFactory(request)
+      requestId = requestId || (requestIdFactory ? requestIdFactory(request) : uuidv1())
 
       als.enterWith(requestId)
       wrapHttpEmitters(request.raw.req, request.raw.res)
