@@ -86,6 +86,30 @@ for (const type of types) {
         })
     })
 
+    test('calls request id factory with req', () => {
+      const app = Fastify()
+      const idFactory = req => req
+      
+      register(type, app, {
+        requestIdFactory: idFactory
+      })
+  
+      app.get('/test', async (request, reply) => {
+        // console.log('request', request)
+        if (request.raw === rTracer.id()) {
+          reply.send({})
+        }
+        else {
+          throw new Error('Invalid')
+        }
+      })
+
+      return app.ready().then(() => request(app.server).get('/test'))
+        .then(res => {
+          expect(res.statusCode).toBe(200)
+        })
+    })
+
     test('ignores header by default', () => {
       const app = Fastify()
       register(type, app)

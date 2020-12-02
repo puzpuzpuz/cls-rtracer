@@ -104,6 +104,30 @@ describe('cls-rtracer for Hapi', () => {
     expect(res.result.id).toEqual(idFactory())
   })
 
+  test('calls request id factory with req', async () => {
+    const idFactory = req => req
+
+    server = await setupServer({
+      options: {
+        requestIdFactory: idFactory
+      },
+      handler: request => {
+        if (request === rTracer.id()) {
+          return 'OK'
+        } else {
+          throw new Error('Not OK')
+        }
+      }
+    })
+
+    const res = await server.inject({
+      method: 'get',
+      url: '/'
+    })
+
+    expect(res.statusCode).toBe(200)
+  })
+
   test('ignores header by default', async () => {
     const idInHead = 'id-from-header'
     let id

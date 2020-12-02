@@ -71,6 +71,28 @@ describe('cls-rtracer for Express', () => {
       })
   })
 
+  test('calls request id factory with req', () => {
+    const app = express()
+    const idFactory = req => req
+
+    app.use(rTracer.expressMiddleware({
+      requestIdFactory: idFactory
+    }))
+
+    app.get('/test', (req, res) => {
+      if (req === rTracer.id()) {
+        res.end()
+      } else {
+        res.status(500).end()
+      }
+    })
+
+    return request(app).get('/test')
+      .then(res => {
+        expect(res.statusCode).toBe(200)
+      })
+  })
+
   test('ignores header by default', () => {
     const app = express()
     app.use(rTracer.expressMiddleware())
