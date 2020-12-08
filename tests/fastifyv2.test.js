@@ -95,7 +95,6 @@ for (const type of types) {
       })
   
       app.get('/test', async (request, reply) => {
-        // console.log('request', request)
         if (request.raw === rTracer.id()) {
           reply.send({})
         }
