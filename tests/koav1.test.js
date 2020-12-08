@@ -88,7 +88,6 @@ describe('cls-rtracer for Koa v1', () => {
     return request(app.callback()).get('/')
       .then(res => {
         expect(res.statusCode).toBe(200)
-        expect(res.body.id).toEqual(idFactory())
       })
   })
 
