@@ -80,8 +80,7 @@ describe('cls-rtracer for Koa v1', () => {
     app.use(function * () {
       if (this.request === rTracer.id()) {
         this.body = 'OK'
-      }
-      else {
+      } else {
         throw new Error('Not OK')
       }
     })

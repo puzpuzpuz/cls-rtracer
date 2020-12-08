@@ -97,8 +97,7 @@ for (const type of types) {
       app.get('/test', async (request, reply) => {
         if (request.raw === rTracer.id()) {
           reply.send({})
-        }
-        else {
+        } else {
           throw new Error('Invalid')
         }
       })

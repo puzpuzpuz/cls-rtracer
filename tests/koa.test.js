@@ -82,8 +82,7 @@ describe('cls-rtracer for Koa', () => {
     app.use((ctx) => {
       if (ctx.request === rTracer.id()) {
         ctx.body = 'OK'
-      }
-      else {
+      } else {
         throw new Error('Not OK')
       }
     })
