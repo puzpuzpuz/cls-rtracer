@@ -42,7 +42,7 @@ const expressMiddleware = (setResHeaderFn) => {
   return ({
     useHeader = false,
     headerName = 'X-Request-Id',
-    requestIdFactory = null,
+    requestIdFactory,
     echoHeader = false
   } = {}) => {
     return (req, res, next) => {
@@ -84,7 +84,7 @@ const fastifyPlugin = (fastify, options, next) => {
     useHeader = false,
     headerName = 'X-Request-Id',
     useFastifyRequestId = false,
-    requestIdFactory = null,
+    requestIdFactory,
     echoHeader = false
   } = options
 
@@ -129,7 +129,7 @@ fastifyPlugin[Symbol.for('fastify.display-name')] = pluginName
 const koaMiddleware = ({
   useHeader = false,
   headerName = 'X-Request-Id',
-  requestIdFactory = null,
+  requestIdFactory,
   echoHeader = false
 } = {}) => {
   return (ctx, next) => {
@@ -166,7 +166,7 @@ const koaMiddleware = ({
 const koaV1Middleware = ({
   useHeader = false,
   headerName = 'X-Request-Id',
-  requestIdFactory = null,
+  requestIdFactory,
   echoHeader = false
 } = {}) => {
   return function * (next) {
@@ -202,7 +202,7 @@ const hapiPlugin = ({
     const {
       useHeader = false,
       headerName = 'X-Request-Id',
-      requestIdFactory = null,
+      requestIdFactory,
       echoHeader = false
     } = options
 
