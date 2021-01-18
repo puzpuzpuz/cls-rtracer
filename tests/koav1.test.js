@@ -70,6 +70,31 @@ describe('cls-rtracer for Koa v1', () => {
       })
   })
 
+  test('passes original request to id factory when provided', () => {
+    const app = new Koa()
+    const idFactory = (req) => {
+      return { client_ip: req.headers.client_ip }
+    }
+    app.use(rTracer.koaV1Middleware({
+      requestIdFactory: idFactory
+    }))
+
+    app.use(function * () {
+      const id = rTracer.id()
+      this.body = { id }
+    })
+
+    return request(app.callback())
+      .get('/')
+      .set('client_ip', '127.0.0.1')
+      .then(res => {
+        expect(res.statusCode).toBe(200)
+        expect(res.body.id).toEqual({
+          client_ip: '127.0.0.1'
+        })
+      })
+  })
+
   test('ignores header by default', () => {
     const app = new Koa()
     app.use(rTracer.koaV1Middleware())
