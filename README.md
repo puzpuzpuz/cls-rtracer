@@ -295,7 +295,7 @@ These are the available config options for the middleware/plugin functions. All 
   // Used if useHeader/echoHeader is set to true.
   headerName: 'X-Request-Id',
   // A custom function to generate your request ids (default: UUID v1).
-  // The function will receive the intercepted request (as-is from the server being used) as its first argument.
+  // The function will receive the intercepted request (as-is from the framework being used) as its first argument.
   // The returned id could be an usual string or any custom object, like in the example below.
   // Ignored if useHeader is set to true.
   requestIdFactory: (request) => { return { id: 'Your request id', client_ip: request.headers.client_ip } },
