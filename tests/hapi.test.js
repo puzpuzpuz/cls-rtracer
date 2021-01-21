@@ -106,7 +106,7 @@ describe('cls-rtracer for Hapi', () => {
 
   test('passes original request to id factory when provided', async () => {
     const idFactory = (req) => {
-      return { client_ip: req.headers.client_ip }
+      return { customHeader: req.headers['x-custom-header'] }
     }
 
     server = await setupServer({
@@ -122,12 +122,12 @@ describe('cls-rtracer for Hapi', () => {
     const res = await server.inject({
       method: 'get',
       url: '/',
-      headers: { client_ip: '127.0.0.1', 'User-Agent': 'Mozilla/5.0' }
+      headers: { 'X-Custom-Header': 'foobarbaz' }
     })
 
     expect(res.statusCode).toBe(200)
     expect(res.result.id).toEqual({
-      client_ip: '127.0.0.1'
+      customHeader: 'foobarbaz'
     })
   })
 

@@ -74,7 +74,7 @@ describe('cls-rtracer for Express', () => {
   test('passes original request to id factory when provided', () => {
     const app = express()
     const idFactory = (req) => {
-      return { client_ip: req.headers.client_ip }
+      return { customHeader: req.headers['x-custom-header'] }
     }
 
     app.use(rTracer.expressMiddleware({
@@ -88,11 +88,11 @@ describe('cls-rtracer for Express', () => {
 
     return request(app)
       .get('/test')
-      .set('client_ip', '127.0.0.1')
+      .set('X-Custom-Header', 'foobarbaz')
       .then(res => {
         expect(res.statusCode).toBe(200)
         expect(res.body.id).toEqual({
-          client_ip: '127.0.0.1'
+          customHeader: 'foobarbaz'
         })
       })
   })

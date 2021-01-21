@@ -4,16 +4,18 @@ export type RequestIdFactory = (req?: IncomingMessage | any) => unknown
 
 export interface IOptions {
   // Default: false
+  echoHeader?: boolean
+  // Default: false
   useHeader?: boolean
   // Default: 'X-Request-Id'
   headerName?: string
   // Default: UUID v1
   requestIdFactory?: RequestIdFactory
-  // Default: false
-  echoHeader?: boolean
 }
 
 export interface IFastifyOptions {
+  // Default: false
+  echoHeader?: boolean
   // Default: false
   useHeader?: boolean
   // Default: 'X-Request-Id'
@@ -22,8 +24,6 @@ export interface IFastifyOptions {
   useFastifyRequestId?: boolean
   // Default: UUID v1
   requestIdFactory?: RequestIdFactory
-  // Default: false
-  echoHeader?: boolean
 }
 
 export interface IHapiPlugin<T> {
