@@ -71,6 +71,32 @@ describe('cls-rtracer for Fastify', () => {
       })
   })
 
+  test('passes original request to id factory when provided', () => {
+    const app = Fastify()
+    const idFactory = (req) => {
+      return { client_ip: req.headers.client_ip }
+    }
+
+    app.register(rTracer.fastifyPlugin, {
+      requestIdFactory: idFactory
+    })
+
+    app.get('/test', async (_, reply) => {
+      const id = rTracer.id()
+      reply.send({ id })
+    })
+
+    return app.ready().then(() => request(app.server)
+      .get('/test')
+      .set('client_ip', '127.0.0.1'))
+      .then(res => {
+        expect(res.statusCode).toBe(200)
+        expect(res.body.id).toEqual({
+          client_ip: '127.0.0.1'
+        })
+      })
+  })
+
   test('ignores header by default', () => {
     const app = Fastify()
     app.register(rTracer.fastifyPlugin)

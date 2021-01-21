@@ -50,7 +50,7 @@ const expressMiddleware = (setResHeaderFn) => {
       if (useHeader) {
         requestId = req.headers[headerName.toLowerCase()]
       }
-      requestId = requestId || requestIdFactory()
+      requestId = requestId || requestIdFactory(req)
 
       if (echoHeader) {
         setResHeaderFn(res, headerName, requestId)
@@ -96,7 +96,7 @@ const fastifyPlugin = (fastify, options, next) => {
     if (useFastifyRequestId) {
       requestId = requestId || request.id
     }
-    requestId = requestId || requestIdFactory()
+    requestId = requestId || requestIdFactory(request)
 
     if (echoHeader) {
       reply.header(headerName, requestId)
@@ -137,7 +137,7 @@ const koaMiddleware = ({
     if (useHeader) {
       requestId = ctx.request.headers[headerName.toLowerCase()]
     }
-    requestId = requestId || requestIdFactory()
+    requestId = requestId || requestIdFactory(ctx.request)
 
     if (echoHeader) {
       ctx.set(headerName, requestId)
@@ -174,7 +174,7 @@ const koaV1Middleware = ({
     if (useHeader) {
       requestId = this.request.headers[headerName.toLowerCase()]
     }
-    requestId = requestId || requestIdFactory()
+    requestId = requestId || requestIdFactory(this.request)
 
     if (echoHeader) {
       this.response.set(headerName, requestId)
@@ -211,7 +211,7 @@ const hapiPlugin = ({
       if (useHeader) {
         requestId = request.headers[headerName.toLowerCase()]
       }
-      requestId = requestId || requestIdFactory()
+      requestId = requestId || requestIdFactory(request)
 
       als.enterWith(requestId)
       wrapHttpEmitters(request.raw.req, request.raw.res)
