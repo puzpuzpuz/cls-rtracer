@@ -6,7 +6,7 @@ const rTracer = require('../index')
 
 const logger = require('pino')({
   mixin () {
-    return { request_id: rTracer.id() }
+    return { requestId: rTracer.id() }
   }
 })
 

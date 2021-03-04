@@ -292,7 +292,7 @@ This is how you can integrate `cls-rtracer` with [pino](https://github.com/pinoj
 // mixin function adds properties of the returned object to the logged JSON.
 const logger = require('pino')({
     mixin () {
-        return { request_id: rTracer.id() }
+        return { requestId: rTracer.id() }
     }
 })
 
