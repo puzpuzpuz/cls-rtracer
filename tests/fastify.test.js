@@ -208,7 +208,7 @@ describe('cls-rtracer for Fastify', () => {
       .then(() => request(app.server).get('/test'))
       .then(res => {
         expect(res.statusCode).toBe(200)
-        expect(res.body.id).toEqual(1)
+        expect(res.body.id).toEqual('req-1')
       })
   })
 
