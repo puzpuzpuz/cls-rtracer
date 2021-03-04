@@ -256,6 +256,10 @@ The main use case for this library is request id generation and logging automati
 
 Without having request id, as a correlation value, in your logs, you will not be able to determine which log entries belong to code that handles the same request. You could generate request ids manually and store them in the Express' `req` object (or Fastify's `request`, or Koa's `ctx`), but then you will have to explicitly pass the object into all other modules on the route. And that's when `cls-rtracer` comes to the rescue!
 
+Complete samples for Express, Fastify and Koa are available in `/samples/` directory.
+
+### Winston
+
 Here is how you can integrate `cls-rtracer` with [winston](https://github.com/winstonjs/winston), one of most popular logging libraries.
 
 ```javascript
@@ -279,7 +283,20 @@ const logger = createLogger({
 })
 ```
 
-Complete samples for Express, Fastify and Koa are available in `/samples/` directory.
+### Pino
+
+This is how you can integrate `cls-rtracer` with [pino](https://github.com/pinojs/pino) logger.
+
+```javascript
+
+// mixin function adds properties of the returned object to the logged JSON.
+const logger = require('pino')({
+    mixin () {
+        return { requestId: rTracer.id() }
+    }
+})
+
+```
 
 ## Configuration
 
