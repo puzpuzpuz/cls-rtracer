@@ -60,7 +60,7 @@
     "logging"
   ],
   "dependencies": {
-    "uuid": "8.3.1"
+    "uuid": "^8.3.2"
   },
   "devDependencies": {
     "@hapi/hapi": "^20.0.1",
