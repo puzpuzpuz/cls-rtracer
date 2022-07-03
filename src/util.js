@@ -9,7 +9,7 @@ function wrapEmitterMethod (emitter, method, wrapper) {
   }
 
   const original = emitter[method]
-  const wrapped = wrapper(original, method)
+  const wrapped = wrapper(original)
   wrapped[isWrappedSymbol] = true
   emitter[method] = wrapped
 
@@ -28,21 +28,49 @@ const removeMethods = [
 ]
 
 /**
- * Wraps EventEmitter listener registration methods of the
- * given emitter, so that all listeners are run in scope of
- * the provided async resource.
+ * Wraps EventEmitter listener registration methods of the given emitter,
+ * so that all listeners are run in scope of the provided async resource.
+ *
+ * Supports registering same listener function to multiple events (or
+ * even the same one), as well as subsequent deregistering.
  */
 function wrapEmitter (emitter, asyncResource) {
   for (const method of addMethods) {
     wrapEmitterMethod(emitter, method, (original) => function (name, handler) {
-      handler[wrappedSymbol] = asyncResource.runInAsyncScope.bind(asyncResource, handler, emitter)
-      return original.call(this, name, handler[wrappedSymbol])
+      let wrapped = handler[wrappedSymbol]
+      if (wrapped === undefined) {
+        wrapped = {}
+        handler[wrappedSymbol] = wrapped
+      }
+      const wrappedHandler = asyncResource.runInAsyncScope.bind(asyncResource, handler, emitter)
+      const existing = wrapped[name]
+      if (existing === undefined) {
+        wrapped[name] = wrappedHandler
+      } else if (typeof existing === 'function') {
+        wrapped[name] = [existing, wrappedHandler]
+      } else {
+        wrapped[name].push(wrappedHandler)
+      }
+      return original.call(this, name, wrappedHandler)
     })
   }
 
   for (const method of removeMethods) {
     wrapEmitterMethod(emitter, method, (original) => function (name, handler) {
-      return original.call(this, name, handler[wrappedSymbol] || handler)
+      let wrappedHandler
+      const wrapped = handler[wrappedSymbol]
+      if (wrapped !== undefined) {
+        const existing = wrapped[name]
+        if (existing !== undefined) {
+          if (typeof existing === 'function') {
+            wrappedHandler = existing
+            delete wrapped[name]
+          } else {
+            wrappedHandler = existing.pop()
+          }
+        }
+      }
+      return original.call(this, name, wrappedHandler || handler)
     })
   }
 }

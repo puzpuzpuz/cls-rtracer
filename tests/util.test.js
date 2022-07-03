@@ -72,3 +72,69 @@ describe('wrapEmitter', () => {
     expect(wrappedMethod1).toEqual(wrappedMethod2)
   })
 })
+
+test('allows registering same listener function to different events', () => {
+  const emitter = new EventEmitter()
+  const asyncResource = new AsyncResource('foobar')
+
+  let called = 0
+
+  wrapEmitter(emitter, asyncResource)
+  emitter.on('foo', myListener)
+  emitter.on('bar', myListener)
+
+  emitter.emit('foo')
+  emitter.emit('bar')
+
+  expect(called).toEqual(2)
+
+  function myListener () {
+    called++
+  }
+})
+
+test('allows registering same listener function to same event', () => {
+  const emitter = new EventEmitter()
+  const asyncResource = new AsyncResource('foobar')
+
+  let called = 0
+
+  wrapEmitter(emitter, asyncResource)
+  emitter.on('foo', myListener)
+  emitter.on('foo', myListener)
+
+  emitter.emit('foo')
+
+  expect(called).toEqual(2)
+
+  function myListener () {
+    called++
+  }
+})
+
+test('allows registering self-deregistering listener function', () => {
+  const emitter = new EventEmitter()
+  const asyncResource = new AsyncResource('foobar')
+
+  let called = 0
+
+  wrapEmitter(emitter, asyncResource)
+  emitter.on('foo', myListener)
+  emitter.on('bar', myListener)
+  emitter.on('bar', myListener)
+
+  emitter.emit('foo')
+  emitter.emit('foo')
+  emitter.emit('bar')
+  emitter.emit('bar')
+
+  expect(called).toEqual(1)
+
+  function myListener () {
+    emitter.removeListener('foo', myListener)
+    emitter.removeListener('foo', myListener) // This call is redundant, so it should be ignored.
+    emitter.removeListener('bar', myListener)
+    emitter.removeListener('bar', myListener)
+    called++
+  }
+})

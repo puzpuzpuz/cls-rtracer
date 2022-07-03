@@ -40,7 +40,7 @@
   ],
   "scripts": {
     "test-ci": "npm run check-type && npm run lint && npm run test",
-    "cover": "jest --coverage --coverageReporters=text-lcov | coveralls",
+    "cover": "jest --coverage --coverageReporters=lcov",
     "test": "jest",
     "lint": "standard",
     "check-type": "tsc index.d.ts"
@@ -63,18 +63,17 @@
     "uuid": "^8.3.2"
   },
   "devDependencies": {
-    "@hapi/hapi": "^20.0.1",
+    "@hapi/hapi": "^20.2.2",
     "@types/node": "^14.14.31",
-    "coveralls": "^3.1.0",
-    "express": "^4.17.1",
-    "fastify": "^3.13.0",
+    "express": "^4.18.1",
+    "fastify": "^4.2.0",
     "fastifyv2": "npm:fastify@^2.15.0",
-    "jest": "^26.6.1",
-    "koa": "^2.13.0",
+    "jest": "^28.1.2",
+    "koa": "^2.13.4",
     "koav1": "npm:koa@^1.7.0",
-    "standard": "^15.0.0",
-    "supertest": "^5.0.0",
-    "typescript": "^4.2.2",
-    "winston": "^3.3.3"
+    "standard": "^17.0.0",
+    "supertest": "^6.2.4",
+    "typescript": "^4.7.4",
+    "winston": "^3.8.1"
   }
 }

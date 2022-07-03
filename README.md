@@ -1,4 +1,4 @@
-[![travis](https://travis-ci.org/puzpuzpuz/cls-rtracer.svg?branch=master)](https://travis-ci.org/puzpuzpuz/cls-rtracer.svg?branch=master)
+![Build Status](https://github.com/puzpuzpuz/cls-rtracer/actions/workflows/build.yml/badge.svg?branch=master)
 [![Coverage Status](https://coveralls.io/repos/github/puzpuzpuz/cls-rtracer/badge.svg?branch=master)](https://coveralls.io/github/puzpuzpuz/cls-rtracer?branch=master)
 [![npm](https://img.shields.io/npm/v/cls-rtracer.svg)](https://www.npmjs.com/package/cls-rtracer)
 [![npm](https://img.shields.io/npm/dm/cls-rtracer.svg)](https://www.npmjs.com/package/cls-rtracer)
