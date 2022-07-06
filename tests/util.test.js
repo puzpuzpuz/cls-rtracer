@@ -122,6 +122,7 @@ test('allows registering self-deregistering listener function', () => {
   emitter.on('foo', myListener)
   emitter.on('bar', myListener)
   emitter.on('bar', myListener)
+  emitter.on('bar', myListener)
 
   emitter.emit('foo')
   emitter.emit('foo')
@@ -133,6 +134,7 @@ test('allows registering self-deregistering listener function', () => {
   function myListener () {
     emitter.removeListener('foo', myListener)
     emitter.removeListener('foo', myListener) // This call is redundant, so it should be ignored.
+    emitter.removeListener('bar', myListener)
     emitter.removeListener('bar', myListener)
     emitter.removeListener('bar', myListener)
     called++
