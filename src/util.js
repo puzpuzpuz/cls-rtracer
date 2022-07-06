@@ -36,41 +36,41 @@ const removeMethods = [
  */
 function wrapEmitter (emitter, asyncResource) {
   for (const method of addMethods) {
-    wrapEmitterMethod(emitter, method, (original) => function (name, handler) {
-      let wrapped = handler[wrappedSymbol]
+    wrapEmitterMethod(emitter, method, (original) => function (event, handler) {
+      let wrapped = emitter[wrappedSymbol]
       if (wrapped === undefined) {
         wrapped = {}
-        handler[wrappedSymbol] = wrapped
+        emitter[wrappedSymbol] = wrapped
       }
       const wrappedHandler = asyncResource.runInAsyncScope.bind(asyncResource, handler, emitter)
-      const existing = wrapped[name]
+      const existing = wrapped[event]
       if (existing === undefined) {
-        wrapped[name] = wrappedHandler
+        wrapped[event] = wrappedHandler
       } else if (typeof existing === 'function') {
-        wrapped[name] = [existing, wrappedHandler]
+        wrapped[event] = [existing, wrappedHandler]
       } else {
-        wrapped[name].push(wrappedHandler)
+        wrapped[event].push(wrappedHandler)
       }
-      return original.call(this, name, wrappedHandler)
+      return original.call(this, event, wrappedHandler)
     })
   }
 
   for (const method of removeMethods) {
-    wrapEmitterMethod(emitter, method, (original) => function (name, handler) {
+    wrapEmitterMethod(emitter, method, (original) => function (event, handler) {
       let wrappedHandler
-      const wrapped = handler[wrappedSymbol]
+      const wrapped = emitter[wrappedSymbol]
       if (wrapped !== undefined) {
-        const existing = wrapped[name]
+        const existing = wrapped[event]
         if (existing !== undefined) {
           if (typeof existing === 'function') {
             wrappedHandler = existing
-            delete wrapped[name]
+            delete wrapped[event]
           } else {
             wrappedHandler = existing.pop()
           }
         }
       }
-      return original.call(this, name, wrappedHandler || handler)
+      return original.call(this, event, wrappedHandler || handler)
     })
   }
 }
