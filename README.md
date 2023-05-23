@@ -332,6 +332,8 @@ These are the available config options for the middleware/plugin functions. All 
 
 ## Advanced features
 
+If you need something different from the default UUID v1 for id generation, you should use the `requestIdFactory` function available in the middleware/plugin config. Note that this function allows storing any object as the id, not only primitive values or strings.
+
 In certain situations you may want to have an id available outside of the request handler scope, say, in a code that acts as a background job. In this case you may use the `runWithId()` function:
 
 ```js
