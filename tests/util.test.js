@@ -112,6 +112,51 @@ test('allows registering same listener function to same event', () => {
   }
 })
 
+test('removes the correct wrapper when distinct listeners share an event', () => {
+  const emitter = new EventEmitter()
+  const asyncResource = new AsyncResource('foobar')
+
+  let aCalled = 0
+  let bCalled = 0
+  const listenerA = () => aCalled++
+  const listenerB = () => bCalled++
+
+  wrapEmitter(emitter, asyncResource)
+  emitter.on('foo', listenerA)
+  emitter.on('foo', listenerB)
+
+  emitter.removeListener('foo', listenerA)
+  emitter.emit('foo')
+
+  expect(aCalled).toEqual(0)
+  expect(bCalled).toEqual(1)
+})
+
+test('removes the most recent wrapper when the same listener is removed multiple times', () => {
+  const emitter = new EventEmitter()
+  const asyncResource = new AsyncResource('foobar')
+
+  let called = 0
+  const listener = () => called++
+
+  wrapEmitter(emitter, asyncResource)
+  emitter.on('foo', listener)
+  emitter.on('foo', listener)
+  emitter.on('foo', listener)
+
+  emitter.removeListener('foo', listener)
+  emitter.emit('foo')
+  expect(called).toEqual(2)
+
+  emitter.removeListener('foo', listener)
+  emitter.emit('foo')
+  expect(called).toEqual(3)
+
+  emitter.removeListener('foo', listener)
+  emitter.emit('foo')
+  expect(called).toEqual(3)
+})
+
 test('allows registering self-deregistering listener function', () => {
   const emitter = new EventEmitter()
   const asyncResource = new AsyncResource('foobar')
