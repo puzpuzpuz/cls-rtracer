@@ -6,14 +6,14 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node-version: [16, 18, 20, 21]
+        node-version: [20, 22, 24]
     name: Build with Node ${{ matrix.node-version }}
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v2.3.4
+        uses: actions/checkout@v4
 
       - name: Install node
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
 
@@ -27,6 +27,6 @@ jobs:
         run: npm run cover
 
       - name: Coveralls
-        uses: coverallsapp/github-action@master
+        uses: coverallsapp/github-action@v2
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
