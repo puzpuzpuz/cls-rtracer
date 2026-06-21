@@ -47,7 +47,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git@github.com:puzpuzpuz/cls-rtracer.git"
+    "url": "git+https://github.com/puzpuzpuz/cls-rtracer.git"
   },
   "keywords": [
     "express",
