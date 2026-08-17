@@ -1,12 +1,17 @@
 'use strict'
 
 const { wrapEmitter } = require('./util')
-const { v1: uuidv1 } = require('uuid')
+const { randomUUID } = require('crypto')
 const { AsyncLocalStorage, AsyncResource } = require('async_hooks')
 
 const pluginName = 'cls-rtracer'
 
 const als = new AsyncLocalStorage()
+
+// Default request id factory. Wraps randomUUID so that arguments passed by the
+// middlewares (e.g. the request object) are ignored rather than treated as
+// randomUUID options.
+const defaultIdFactory = () => randomUUID()
 
 const wrapHttpEmitters = (req, res) => {
   const asyncResource = new AsyncResource('cls-rtracer')
@@ -35,14 +40,14 @@ const expressMiddleware = (setResHeaderFn) => {
    * @param {string} options.headerName request header name, used if `useHeader`/`echoHeader` is set to `true`
    *                                    (default: `X-Request-Id`)
    * @param {function} options.requestIdFactory function used to generate request ids
-   *                                    (default: UUIDs v1)
+   *                                    (default: UUIDs v4)
    * @param {boolean} options.echoHeader injects `headerName` header into the response
    *                                    (default: `false`)
    */
   return ({
     useHeader = false,
     headerName = 'X-Request-Id',
-    requestIdFactory = uuidv1,
+    requestIdFactory = defaultIdFactory,
     echoHeader = false
   } = {}) => {
     return (req, res, next) => {
@@ -75,7 +80,7 @@ const expressMiddleware = (setResHeaderFn) => {
  * @param {boolean} options.useFastifyRequestId respect Fastify request id flag
  *                                    (default: `false`)
  * @param {function} options.requestIdFactory function used to generate request ids
- *                                    (default: UUIDs v1)
+ *                                    (default: UUIDs v4)
  * @param {boolean} options.echoHeader injects `headerName` header into the response
  *                                    (default: `false`)
  */
@@ -84,7 +89,7 @@ const fastifyPlugin = (fastify, options, next) => {
     useHeader = false,
     headerName = 'X-Request-Id',
     useFastifyRequestId = false,
-    requestIdFactory = uuidv1,
+    requestIdFactory = defaultIdFactory,
     echoHeader = false
   } = options
 
@@ -122,14 +127,14 @@ fastifyPlugin[Symbol.for('fastify.display-name')] = pluginName
  * @param {string} options.headerName request header name, used if `useHeader`/`echoHeader` is set to `true`
  *                                    (default: `X-Request-Id`)
  * @param {function} options.requestIdFactory function used to generate request ids
- *                                    (default: UUIDs v1)
+ *                                    (default: UUIDs v4)
  * @param {boolean} options.echoHeader injects `headerName` header into the response
  *                                    (default: `false`)
  */
 const koaMiddleware = ({
   useHeader = false,
   headerName = 'X-Request-Id',
-  requestIdFactory = uuidv1,
+  requestIdFactory = defaultIdFactory,
   echoHeader = false
 } = {}) => {
   return (ctx, next) => {
@@ -159,14 +164,14 @@ const koaMiddleware = ({
  * @param {string} options.headerName request header name, used if `useHeader`/`echoHeader` is set to `true`
  *                                    (default: `X-Request-Id`)
  * @param {function} options.requestIdFactory function used to generate request ids
- *                                    (default: UUIDs v1)
+ *                                    (default: UUIDs v4)
  * @param {boolean} options.echoHeader injects `headerName` header into the response
  *                                    (default: `false`)
  */
 const koaV1Middleware = ({
   useHeader = false,
   headerName = 'X-Request-Id',
-  requestIdFactory = uuidv1,
+  requestIdFactory = defaultIdFactory,
   echoHeader = false
 } = {}) => {
   return function * (next) {
@@ -202,7 +207,7 @@ const hapiPlugin = ({
     const {
       useHeader = false,
       headerName = 'X-Request-Id',
-      requestIdFactory = uuidv1,
+      requestIdFactory = defaultIdFactory,
       echoHeader = false
     } = options
 
@@ -243,7 +248,7 @@ const hapiPlugin = ({
  * @param {*} id optional id to be available in the function
  */
 const runWithId = (fn, id) => {
-  id = id || uuidv1()
+  id = id || randomUUID()
   return als.run(id, fn)
 }
 

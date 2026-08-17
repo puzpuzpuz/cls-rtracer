@@ -1,12 +1,16 @@
 {
-  "name": "cls-rtracer",
-  "version": "2.6.4",
-  "description": "Express & Koa middlewares and Fastify & Hapi plugins for CLS-based request id generation, batteries included",
+  "name": "@lengarvey/cls-rtracer",
+  "version": "3.0.0",
+  "description": "Express & Koa middlewares and Fastify & Hapi plugins for CLS-based request id generation, batteries included. Fork with zero runtime dependencies (native crypto.randomUUID).",
   "author": {
     "name": "Andrey Pechkurov",
     "url": "https://github.com/puzpuzpuz"
   },
   "contributors": [
+    {
+      "name": "Len Garvey",
+      "url": "https://github.com/lengarvey"
+    },
     {
       "name": "Andrey Goncharov",
       "url": "https://github.com/aigoncharov"
@@ -26,12 +30,12 @@
   ],
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/puzpuzpuz/cls-rtracer/issues"
+    "url": "https://github.com/lengarvey/cls-rtracer-lite/issues"
   },
-  "homepage": "https://github.com/puzpuzpuz/cls-rtracer",
+  "homepage": "https://github.com/lengarvey/cls-rtracer-lite",
   "main": "index.js",
   "engines": {
-    "node": ">=12.17.0 <13.0.0 || >=13.14.0 <14.0.0 || >=14.0.0"
+    "node": ">=16.0.0"
   },
   "files": [
     "src/*",
@@ -47,7 +51,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git@github.com:puzpuzpuz/cls-rtracer.git"
+    "url": "git@github.com:lengarvey/cls-rtracer-lite.git"
   },
   "keywords": [
     "express",
@@ -59,9 +63,6 @@
     "request id",
     "logging"
   ],
-  "dependencies": {
-    "uuid": "^9.0.1"
-  },
   "devDependencies": {
     "@hapi/hapi": "^21.4.9",
     "@types/node": "^24.12.3",

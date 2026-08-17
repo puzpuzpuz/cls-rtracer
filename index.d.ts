@@ -9,7 +9,7 @@ export interface IOptions {
   useHeader?: boolean
   // Default: 'X-Request-Id'
   headerName?: string
-  // Default: UUID v1
+  // Default: UUID v4
   requestIdFactory?: RequestIdFactory
 }
 
@@ -22,7 +22,7 @@ export interface IFastifyOptions {
   headerName?: string
   // Default: false
   useFastifyRequestId?: boolean
-  // Default: UUID v1
+  // Default: UUID v4
   requestIdFactory?: RequestIdFactory
 }
 

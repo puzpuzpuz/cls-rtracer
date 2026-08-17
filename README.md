@@ -1,26 +1,26 @@
-![Build Status](https://github.com/puzpuzpuz/cls-rtracer/actions/workflows/build.yml/badge.svg?branch=master)
-[![Coverage Status](https://coveralls.io/repos/github/puzpuzpuz/cls-rtracer/badge.svg?branch=master)](https://coveralls.io/github/puzpuzpuz/cls-rtracer?branch=master)
-[![npm](https://img.shields.io/npm/v/cls-rtracer.svg)](https://www.npmjs.com/package/cls-rtracer)
-[![npm](https://img.shields.io/npm/dm/cls-rtracer.svg)](https://www.npmjs.com/package/cls-rtracer)
+[![npm](https://img.shields.io/npm/v/@lengarvey/cls-rtracer.svg)](https://www.npmjs.com/package/@lengarvey/cls-rtracer)
+[![npm](https://img.shields.io/npm/dm/@lengarvey/cls-rtracer.svg)](https://www.npmjs.com/package/@lengarvey/cls-rtracer)
 
-# cls-rtracer
+# @lengarvey/cls-rtracer
+
+> **Fork notice.** This is a fork of the excellent [`cls-rtracer`](https://github.com/puzpuzpuz/cls-rtracer) by [Andrey Pechkurov](https://github.com/puzpuzpuz), published as `@lengarvey/cls-rtracer`. It removes the `uuid` dependency in favour of Node's native `crypto.randomUUID()`, so the package now ships with **zero runtime dependencies**. The default request id format changed from UUID v1 to UUID v4, and the minimum supported Node.js version is now 16.0.0. All credit for the original library goes to the upstream authors.
 
 Request Tracer - Express & Koa middlewares and Fastify & Hapi plugins for CLS-based request id generation, batteries included. An out-of-the-box solution for adding request ids into your logs. Check out [this blog post](https://medium.com/@apechkurov/request-id-tracing-in-node-js-applications-c517c7dab62d) that describes the rationale behind `cls-rtracer`.
 
-Automatically generates a UUID V1 value as the id for each request and stores it in `AsyncLocalStorage` (CLS core API, see [this blog post](https://itnext.io/one-node-js-cls-api-to-rule-them-all-1670ac66a9e8)). Optionally, if the request contains `X-Request-Id` header, uses its value instead. Allows to obtain the generated request id anywhere in your routes later and use it for logging or any other purposes.
+Automatically generates a UUID v4 value as the id for each request and stores it in `AsyncLocalStorage` (CLS core API, see [this blog post](https://itnext.io/one-node-js-cls-api-to-rule-them-all-1670ac66a9e8)). Optionally, if the request contains `X-Request-Id` header, uses its value instead. Allows to obtain the generated request id anywhere in your routes later and use it for logging or any other purposes.
 
 Tested and works fine with Express v5, Fastify v2 and v5, Koa v1 and v3, and Hapi v21.
 
 ## Supported Node.js versions
 
-`cls-rtracer` v3 requires Node.js 16.0.0 or newer.
+`@lengarvey/cls-rtracer` v3 requires Node.js 16.0.0 or newer.
 
 ## How to use it - Step 1
 
 Install:
 
 ```bash
-npm install --save cls-rtracer
+npm install --save @lengarvey/cls-rtracer
 ```
 
 Note for TypeScript users: typings are included.
@@ -35,7 +35,7 @@ Use the middleware provided by the library:
 
 ```javascript
 const express = require('express')
-const rTracer = require('cls-rtracer')
+const rTracer = require('@lengarvey/cls-rtracer')
 
 const app = express()
 // any third party middleware that does not need access to request ids goes here
@@ -85,7 +85,7 @@ Use the plugin provided by the library:
 
 ```javascript
 const fastify = require('fastify')()
-const rTracer = require('cls-rtracer')
+const rTracer = require('@lengarvey/cls-rtracer')
 
 // any third party plugin that does not need access to request ids goes here
 // ...
@@ -140,7 +140,7 @@ Use the middleware provided by the library:
 
 ```javascript
 const Koa = require('koa')
-const rTracer = require('cls-rtracer')
+const rTracer = require('@lengarvey/cls-rtracer')
 
 const app = new Koa()
 // any third party middleware that does not need access to request ids goes here
@@ -192,7 +192,7 @@ Use the plugin provided by the library:
 
 ```javascript
 const Hapi = require('@hapi/hapi')
-const rTracer = require('cls-rtracer')
+const rTracer = require('@lengarvey/cls-rtracer')
 
 const init = async () => {
   const server = Hapi.server({
@@ -315,7 +315,7 @@ These are the available config options for the middleware/plugin functions. All 
   // Request/response header name, case insensitive (default: 'X-Request-Id').
   // Used if useHeader/echoHeader is set to true.
   headerName: 'X-Request-Id',
-  // A custom function to generate your request ids (default: UUID v1).
+  // A custom function to generate your request ids (default: UUID v4).
   // The function will receive the intercepted request (as-is from the framework
   // being used) as its first argument. The returned id could be a usual string,
   // or a number, or any custom object, like in the example below.
@@ -332,12 +332,12 @@ These are the available config options for the middleware/plugin functions. All 
 
 ## Advanced features
 
-If you need something different from the default UUID v1 for id generation, you should use the `requestIdFactory` function available in the middleware/plugin config. Note that this function allows storing any object as the id, not only primitive values or strings.
+If you need something different from the default UUID v4 for id generation, you should use the `requestIdFactory` function available in the middleware/plugin config. Note that this function allows storing any object as the id, not only primitive values or strings.
 
 In certain situations you may want to have an id available outside of the request handler scope, say, in a code that acts as a background job. In this case you may use the `runWithId()` function:
 
 ```js
-const rTracer = require('cls-rtracer')
+const rTracer = require('@lengarvey/cls-rtracer')
 
 rTracer.runWithId(() => {
   console.log(rTracer.id()) // id is available here
